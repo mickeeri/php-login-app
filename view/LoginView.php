@@ -10,21 +10,42 @@ class LoginView {
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
 
-	
 
 	/**
 	 * Create HTTP response
 	 *
-	 * Should be called after a login attempt has been determined
+	 * Should be called after a login attempt has been determined. // Men den anropas ju från början efet layuout view.
 	 *
 	 * @return  void BUT writes to standard output and cookies!
 	 */
 	public function response() {
-		$message = '';
-		
+		$message = "";
+
+		if($this->didUserPressLoginButton()) {
+			// Blank username
+			if ($_POST[self::$name] == "") {
+				$message = "Username is missing";
+			}
+			// Blank password
+			elseif ($_POST[self::$password] == "") {
+				$message = "Password is missing";
+			}
+		}
+						
+		// If unsuccessful show message and generate form again. 
 		$response = $this->generateLoginFormHTML($message);
-		//$response .= $this->generateLogoutButtonHTML($message);
+
+		// If login attempt is successful. 
+		// $response .= $this->generateLogoutButtonHTML($message);
+
 		return $response;
+	}
+
+	public function didUserPressLoginButton() {
+		// If user has pressed submit button launch method response.
+		if (isset($_POST[self::$login]))
+			return true;
+		return false;
 	}
 
 	/**
@@ -47,7 +68,7 @@ class LoginView {
 	* @return  void, BUT writes to standard output!
 	*/
 	private function generateLoginFormHTML($message) {
-		return '
+		$ret =  '
 			<form method="post" > 
 				<fieldset>
 					<legend>Login - enter Username and password</legend>
@@ -62,15 +83,21 @@ class LoginView {
 					<label for="' . self::$keep . '">Keep me logged in  :</label>
 					<input type="checkbox" id="' . self::$keep . '" name="' . self::$keep . '" />
 					
-					<input type="submit" name="' . self::$login . '" value="login" />
+					<input type="submit" id="btnSubmit" name="' . self::$login . '" value="Login" />
 				</fieldset>
 			</form>
 		';
+
+
+
+		return $ret;
 	}
 	
 	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
 	private function getRequestUserName() {
 		//RETURN REQUEST VARIABLE: USERNAME
 	}
+
+
 	
 }
