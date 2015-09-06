@@ -11,60 +11,77 @@ class LoginView {
 	private static $cookiePassword = 'LoginView::CookiePassword';
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
-	// private static $nameValue = "LoginView::NameValue";
-	// private $cookies;
 
-	// public function __construct() {
-	// 	$this->cookies = new \view\CookieStorage();
-	// }
+	public function __construct(LoginController $controller) {
+		$this->controller = $controller;
+	}
 
+	// var_dump($this->controller);
 
 	/**
 	 * Create HTTP response
 	 *
-	 * Should be called after a login attempt has been determined. // Men den anropas ju från början efet layuout view.
+	 * Should be called after a login attempt has been determined.
 	 *
 	 * @return  void BUT writes to standard output and cookies!
 	 */
 	public function response() {
-		$message = "";
+		
+		// Message to be displayed as user feedback.
+		$message ="";
+		// Saved username if login attempt is unsuccessful.
 		$nameValue = "";
 
-		if($this->didUserPressLoginButton()) {
-			
+		//$response = $this->generateLoginFormHTML($message, $nameValue);
 
+		if($this->didUserPressLoginButton()) {
+			// Entered named.
 			$postName = (isset($_POST[self::$name]) ? $_POST[self::$name] : NULL);
+			// Entered password.
 			$postPassword = $_POST[self::$password];			
-			//print("Har klickat på knappen.");
 
 			// Blank username
 			if ($postName == NULL) {
 				$message = "Username is missing";
+				$response = $this->generateLoginFormHTML($message, $nameValue);
 			}
 			// Blank password
 			elseif ($postPassword == NULL) {
 				$message = "Password is missing";
-				$nameValue = $postName;		
+				$nameValue = $postName;
+				$response = $this->generateLoginFormHTML($message, $nameValue);		
 			}
-
-			// header('Location: '.$_SERVER['PHP_SELF']);
-				
-		} else {
-
-			$nameValue = "";		
+			// Both text-field are filled.
+			else {
+				// OM användaren har skrivit in anv och lösen bör de sparas i Cookies.
+				// Correct credentials.
+				if($this->controller->checkCredentials($postName, $postPassword)) {
+					setcookie("CookieStorage", "logged-in", -1);
+					header('Location: '.$_SERVER['PHP_SELF']);
+					$message = "Welcome";
+					$response = $this->generateLogoutButtonHTML($message);
+					
+				// Wrong credentials.
+				} else {
+					setcookie("CookieStorage", "not-logged-in", -1);
+					$message = "Wrong name or password";
+					$response = $this->generateLoginFormHTML($message, $nameValue);
+				}		
+			}		
+		} 
+		// User has not pressed login-button.
+		else {
+			setcookie("CookieStorage", "not-logged-in", -1);
+			$nameValue = "";
+			// self::$isLoggedIn = $this->controller->getIsLoggedIn();
+			$response = $this->generateLoginFormHTML($message, $nameValue);	
 		}
-						
-
-
-		$response = $this->generateLoginFormHTML($message, $nameValue);
-
-		// If login attempt is successful. 
-		// $response .= $this->generateLogoutButtonHTML($message);
-
+								
+		// header('Location: '.$_SERVER['PHP_SELF']);
 		return $response;
 	}
 
-	public function didUserPressLoginButton() {
+	private function didUserPressLoginButton() {
 		// If user has pressed submit button launch method response.
 		if (isset($_POST[self::$login]))
 			return true;
