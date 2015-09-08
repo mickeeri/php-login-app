@@ -1,44 +1,55 @@
 <?php
 
+session_start();
+
 require_once("model/LoginModel.php");
 require_once("view/LoginView.php");
+require_once("view/LayoutView.php");
 
 class LoginController {
-	// private $view;
+	// PROPERTIES
 	private $model;
-	private $isLoggedIn;
+	private $layoutView;
 
+	// CONSTRUCTOR
 	public function __construct() {
 		$this->model = new LoginModel();
-		$this->isLoggedIn = false;
-		// $this->loginView = new LoginView($this->model);
+		$this->layoutView = new LayoutView();
+		$this->loginView = new LoginView($this);
+		$this->dateTimeView = new DateTimeView();
+
 	}
 
-	public function getIsLoggedIn() {
-		return $this->isLoggedIn;
-	}
+	// FUNCTIONS
 
-	private function setIsLoggedIn($isLoggedIn) {
-		$this->isLoggedIn = $isLoggedIn;
-	}
-
-	// public function doLogin() {
-	// 	// Hämta utdata. Har användaren tryckt på knappen.
-	// 	if($this->loginView->didUserPressLoginButton()) {
-			
-	// 	}
-	// 	// Genererar uttdata. 
-	// 	return $this->loginView->response($message);
-	// }
-
-	// If user name and password is correct return true.
-	public function checkCredentials($userName, $password) {
-		if($userName == $this->model->getCorrectUserName() && $password == $this->model->getCorrectPassword()) {
-			// $this->model->isLoggedIn(true);
-			$this->setIsLoggedIn(true);
+	public function isLoggedIn() {
+		if(isset($_SESSION["Username"]))
 			return true;
-		} else {
+		return false;
+	}
+
+	public function renderPage(){
+		$this->layoutView->render($this->isLoggedIn(), $this->loginView, $this->dateTimeView);
+	}
+	
+	public function login($userName, $password) {
+		// Compares parameters with valid credentials in model.		
+		if($userName == $this->model->getCorrectUserName() && $password == $this->model->getCorrectPassword()) {
+			// Creates new session.
+			$_SESSION["Username"] = $userName;
+			// Reloads page.
+			header('Location: '.$_SERVER['PHP_SELF']);		
+			return true;
+		}
+		else {
 			return false;
 		}
+	}
+
+	public function logout() {
+		// Removes session.
+		unset($_SESSION["Username"]); // todo: tar bort strängberoende här.
+		// Reloads page.
+		header('Location: '.$_SERVER['PHP_SELF']);
 	}
 }

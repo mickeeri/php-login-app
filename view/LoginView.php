@@ -1,6 +1,6 @@
 <?php
 
-// require_once('CookieStorage.php');
+require_once('CookieStorage.php');
 
 class LoginView {
 	private static $login = 'LoginView::Login';
@@ -14,6 +14,7 @@ class LoginView {
 
 	public function __construct(LoginController $controller) {
 		$this->controller = $controller;
+		$this->cookies = new CookieStorage();
 	}
 
 	// var_dump($this->controller);
@@ -26,58 +27,58 @@ class LoginView {
 	 * @return  void BUT writes to standard output and cookies!
 	 */
 	public function response() {
-		
-		// Message to be displayed as user feedback.
 		$message ="";
-		// Saved username if login attempt is unsuccessful.
-		$nameValue = "";
 
-		//$response = $this->generateLoginFormHTML($message, $nameValue);
+		// User is logged in.
+		if($this->controller->isLoggedIn()) {
+			$response = $this->generateLogoutButtonHTML($message);
 
-		if($this->didUserPressLoginButton()) {
-			// Entered named.
-			$postName = (isset($_POST[self::$name]) ? $_POST[self::$name] : NULL);
-			// Entered password.
-			$postPassword = $_POST[self::$password];			
+			//header('Location: '.$_SERVER['PHP_SELF']);
 
-			// Blank username
-			if ($postName == NULL) {
-				$message = "Username is missing";
-				$response = $this->generateLoginFormHTML($message, $nameValue);
+			if($this->didUserPressLogoutButton()) {
+				$message = "Bye bye!";
+				$this->controller->logout();
 			}
-			// Blank password
-			elseif ($postPassword == NULL) {
-				$message = "Password is missing";
-				$nameValue = $postName;
-				$response = $this->generateLoginFormHTML($message, $nameValue);		
-			}
-			// Both text-field are filled.
-			else {
-				// OM användaren har skrivit in anv och lösen bör de sparas i Cookies.
-				// Correct credentials.
-				if($this->controller->checkCredentials($postName, $postPassword)) {
-					setcookie("CookieStorage", "logged-in", -1);
-					header('Location: '.$_SERVER['PHP_SELF']);
+		} 
+		// User is not logged in.
+		else {		
+			// User is trying to log in.			
+			if($this->didUserPressLoginButton()) {
+				
+				// Reloads page.
+				header('Location: '.$_SERVER['PHP_SELF']);
+
+				// Saves info in cookies.
+				$this->cookies->save("Username", $this->getRequestUserName());
+				$this->cookies->save("Password", $this->getRequestPassword());
+			} 
+			else {			
+
+
+
+				// Loads username and password from cookie and preforms log-in attempt.
+				$isLoggedIn = $this->controller->login($this->getRequestUserNameCookie(),  $this->getRequestPasswordCookie());
+
+				// Skicka meddelande och sådant från controllern istället.
+				if($isLoggedIn) {
 					$message = "Welcome";
 					$response = $this->generateLogoutButtonHTML($message);
-					
-				// Wrong credentials.
+
 				} else {
-					setcookie("CookieStorage", "not-logged-in", -1);
-					$message = "Wrong name or password";
-					$response = $this->generateLoginFormHTML($message, $nameValue);
-				}		
-			}		
-		} 
-		// User has not pressed login-button.
-		else {
-			setcookie("CookieStorage", "not-logged-in", -1);
-			$nameValue = "";
-			// self::$isLoggedIn = $this->controller->getIsLoggedIn();
-			$response = $this->generateLoginFormHTML($message, $nameValue);	
+					// Error handling.
+					if($this->getRequestUserNameCookie() === "") {
+						$message = "Username is missing";
+					} elseif($this->getRequestPasswordCookie() === "") {
+						$message = "Password is missing";
+					} else {
+						$message = "Wrong name or password";
+					}
+					
+					$response = $this->generateLoginFormHTML($message);
+				}
+			}
 		}
-								
-		// header('Location: '.$_SERVER['PHP_SELF']);
+
 		return $response;
 	}
 
@@ -86,6 +87,12 @@ class LoginView {
 		if (isset($_POST[self::$login]))
 			return true;
 		return false;
+	}
+
+	private function didUserPressLogoutButton() {
+		if (isset($_POST[self::$logout]))
+			return true;
+		return false;	
 	}
 
 	/**
@@ -107,7 +114,7 @@ class LoginView {
 	* @param $message, String output message
 	* @return  void, BUT writes to standard output!
 	*/
-	private function generateLoginFormHTML($message, $nameValue) {
+	private function generateLoginFormHTML($message) {
 		$ret =  '
 			<form method="post" > 
 				<fieldset>
@@ -115,7 +122,7 @@ class LoginView {
 					<p id="' . self::$messageId . '">' . $message . '</p>
 					
 					<label for="' . self::$name . '">Username :</label>
-					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $nameValue . '" />
+					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $this->getRequestUserNameCookie() . '" />
 
 					<label for="' . self::$password . '">Password :</label>
 					<input type="password" id="' . self::$password . '" name="' . self::$password . '" />
@@ -133,7 +140,19 @@ class LoginView {
 	
 	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
 	private function getRequestUserName() {
-		//RETURN REQUEST VARIABLE: USERNAME
+		return isset($_POST[self::$name]) ? $_POST[self::$name] : "";
+	}
+
+	private function getRequestPassword() {
+		return isset($_POST[self::$password]) ? $_POST[self::$password] : "";
+	}
+
+	private function getRequestUserNameCookie() {
+		return self::$cookieName = $this->cookies->load("Username");
+	}
+
+	private function getRequestPasswordCookie() {
+		return self::$cookiePassword = $this->cookies->load("Password");
 	}
 
 
