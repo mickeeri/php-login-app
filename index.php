@@ -20,5 +20,5 @@ $c = new LoginController();
 $dtv = new DateTimeView();
 $lv = new LayoutView();
 
-// public function render($isLoggedIn, LoginView $v, DateTimeView $dtv)
+// Renders page
 $c->renderPage();

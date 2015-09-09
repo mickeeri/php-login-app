@@ -29,6 +29,8 @@ class LoginView {
 	public function response() {
 		$message ="";
 
+
+
 		// User is logged in.
 		if($this->controller->isLoggedIn()) {
 			$response = $this->generateLogoutButtonHTML($message);
@@ -41,39 +43,35 @@ class LoginView {
 			}
 		} 
 		// User is not logged in.
-		else {		
-			// User is trying to log in.			
+		else {	
+			$response = $this->generateLoginFormHTML($message);	
+			// User has pressed login-button		
 			if($this->didUserPressLoginButton()) {
 				
-				// Reloads page.
 				header('Location: '.$_SERVER['PHP_SELF']);
+				// Saves info in cookies.				
+				$this->cookies->save(self::$cookieName, $this->getRequestUserName());
+				$this->cookies->save(self::$cookiePassword, $this->getRequestPassword());
+				// Saves info on whether user clicked button or not.
+				$this->cookies->save("Submitted", $this->didUserPressLoginButton());
 
-				// Saves info in cookies.
-				$this->cookies->save("Username", $this->getRequestUserName());
-				$this->cookies->save("Password", $this->getRequestPassword());
+				// Reloads page.				
 			} 
+			// On reload.
 			else {			
-
-
-
 				// Loads username and password from cookie and preforms log-in attempt.
 				$isLoggedIn = $this->controller->login($this->getRequestUserNameCookie(),  $this->getRequestPasswordCookie());
 
-				// Skicka meddelande och sådant från controllern istället.
 				if($isLoggedIn) {
 					$message = "Welcome";
 					$response = $this->generateLogoutButtonHTML($message);
 
 				} else {
-					// Error handling.
-					if($this->getRequestUserNameCookie() === "") {
-						$message = "Username is missing";
-					} elseif($this->getRequestPasswordCookie() === "") {
-						$message = "Password is missing";
-					} else {
-						$message = "Wrong name or password";
-					}
-					
+					// var_dump(isset($_GET["index"]));
+					// Only display message if submit-button is clicked.
+					if ($this->cookies->load("Submitted") == "1") {
+						$message = $this->controller->errorMessage;	
+					}											
 					$response = $this->generateLoginFormHTML($message);
 				}
 			}
@@ -148,11 +146,11 @@ class LoginView {
 	}
 
 	private function getRequestUserNameCookie() {
-		return self::$cookieName = $this->cookies->load("Username");
+		return $this->cookies->load(self::$cookieName);
 	}
 
 	private function getRequestPasswordCookie() {
-		return self::$cookiePassword = $this->cookies->load("Password");
+		return $this->cookies->load(self::$cookiePassword);
 	}
 
 

@@ -10,6 +10,7 @@ class LoginController {
 	// PROPERTIES
 	private $model;
 	private $layoutView;
+	public $errorMessage = "";
 
 	// CONSTRUCTOR
 	public function __construct() {
@@ -23,26 +24,43 @@ class LoginController {
 	// FUNCTIONS
 
 	public function isLoggedIn() {
+		// Flytta till model.
 		if(isset($_SESSION["Username"]))
 			return true;
 		return false;
 	}
 
 	public function renderPage(){
+		// Flytta innehåll från response hit. 
 		$this->layoutView->render($this->isLoggedIn(), $this->loginView, $this->dateTimeView);
 	}
 	
 	public function login($userName, $password) {
-		// Compares parameters with valid credentials in model.		
-		if($userName == $this->model->getCorrectUserName() && $password == $this->model->getCorrectPassword()) {
-			// Creates new session.
-			$_SESSION["Username"] = $userName;
-			// Reloads page.
-			header('Location: '.$_SERVER['PHP_SELF']);		
-			return true;
-		}
-		else {
+		try {
+			// Error handeling
+			if($userName == "") {
+				throw new Exception("Username is missing");
+			} elseif ($password == "") {
+				throw new Exception("Password is missing");
+			} else {
+				// Compares parameters with valid credentials in model.		
+				if($userName == $this->model->getCorrectUserName() && $password == $this->model->getCorrectPassword()) {
+					// Creates new session.
+					$_SESSION["Username"] = $userName;
+					// Reloads page.
+					header('Location: '.$_SERVER['PHP_SELF']);	
+					return true;
+				}
+				else {
+					throw new Exception("Wrong name or password");
+					return false;
+				}
+			}
+		
 			return false;
+
+		} catch(Exception $e) {
+			$this->errorMessage = $e->getMessage();
 		}
 	}
 
