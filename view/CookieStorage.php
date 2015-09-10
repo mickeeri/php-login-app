@@ -13,6 +13,8 @@ class CookieStorage {
 		// Tar bort kakan. 
 		setcookie($name, "", time() - 1);
 
+		//header('Location: '.$_SERVER['PHP_SELF']);
+
 		return $ret;
 	}
 }

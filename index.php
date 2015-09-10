@@ -13,12 +13,19 @@ error_reporting(E_ALL);
 ini_set('display_errors', 'On');
 
 // Create objects of controller
-$c = new LoginController();
+// 
+$loginView = new LoginView();
+$loginModel = new loginModel($loginView);
+$loginController = new loginController($loginModel, $loginView);
 
 //CREATE OBJECTS OF THE VIEWS
-// $v = new LoginView($c);
-$dtv = new DateTimeView();
-$lv = new LayoutView();
+$dateTimeView = new DateTimeView();
+$layoutView = new LayoutView();
 
-// Renders page
-$c->renderPage();
+
+
+$isLoggedIn = $loginController->isLoggedIn();
+
+
+// Passing loginView as parameter to method isLoggedIn in loginController.
+$layoutView->render($isLoggedIn, $loginView, $dateTimeView);

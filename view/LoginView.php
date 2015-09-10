@@ -1,6 +1,7 @@
 <?php
 
 require_once('CookieStorage.php');
+require_once("controller/LoginController.php");
 
 class LoginView {
 	private static $login = 'LoginView::Login';
@@ -11,13 +12,11 @@ class LoginView {
 	private static $cookiePassword = 'LoginView::CookiePassword';
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
+	public $message;
 
-	public function __construct(LoginController $controller) {
-		$this->controller = $controller;
+	public function __construct() {	
 		$this->cookies = new CookieStorage();
 	}
-
-	// var_dump($this->controller);
 
 	/**
 	 * Create HTTP response
@@ -26,71 +25,90 @@ class LoginView {
 	 *
 	 * @return  void BUT writes to standard output and cookies!
 	 */
-	public function response() {
-		$message ="";
+	public function response($isLoggedIn) {
+		
+		$message = $this->message;
 
-
-
-		// User is logged in.
-		if($this->controller->isLoggedIn()) {
+		if($isLoggedIn) {
 			$response = $this->generateLogoutButtonHTML($message);
-
+		} else {
+			// Saves username and password in cookies.
+			// 
 			//header('Location: '.$_SERVER['PHP_SELF']);
+			
+			// $this->cookies->save(self::$cookieName, $this->getRequestUserName());
+			// $this->cookies->save(self::$cookiePassword, $this->getRequestPassword());
 
-			if($this->didUserPressLogoutButton()) {
-				$message = "Bye bye!";
-				$this->controller->logout();
-			}
-		} 
-		// User is not logged in.
-		else {	
-			$response = $this->generateLoginFormHTML($message);	
-			// User has pressed login-button		
-			if($this->didUserPressLoginButton()) {
-				
-				header('Location: '.$_SERVER['PHP_SELF']);
-				// Saves info in cookies.				
-				$this->cookies->save(self::$cookieName, $this->getRequestUserName());
-				$this->cookies->save(self::$cookiePassword, $this->getRequestPassword());
-				// Saves info on whether user clicked button or not.
-				$this->cookies->save("Submitted", $this->didUserPressLoginButton());
-
-				// Reloads page.				
-			} 
-			// On reload.
-			else {			
-				// Loads username and password from cookie and preforms log-in attempt.
-				$isLoggedIn = $this->controller->login($this->getRequestUserNameCookie(),  $this->getRequestPasswordCookie());
-
-				if($isLoggedIn) {
-					$message = "Welcome";
-					$response = $this->generateLogoutButtonHTML($message);
-
-				} else {
-					// var_dump(isset($_GET["index"]));
-					// Only display message if submit-button is clicked.
-					if ($this->cookies->load("Submitted") == "1") {
-						$message = $this->controller->errorMessage;	
-					}											
-					$response = $this->generateLoginFormHTML($message);
-				}
-			}
+			$response = $this->generateLoginFormHTML($message);
 		}
 
 		return $response;
+
+
+		// // User is logged in.
+		// if($this->controller->isLoggedIn()) {
+		// 	$response = $this->generateLogoutButtonHTML($message);
+
+		// 	//header('Location: '.$_SERVER['PHP_SELF']);
+
+		// 	if($this->didUserPressLogoutButton()) {
+		// 		$message = "Bye bye!";
+		// 		$this->controller->logout();
+		// 	}
+		// } 
+		// // User is not logged in.
+		// else {	
+		// 	$response = $this->generateLoginFormHTML($message);	
+		// 	// User has pressed login-button		
+		// 	if($this->didUserPressLoginButton()) {
+				
+		// 		header('Location: '.$_SERVER['PHP_SELF']);
+		// 		// Saves info in cookies.				
+		// 		$this->cookies->save(self::$cookieName, $this->getRequestUserName());
+		// 		$this->cookies->save(self::$cookiePassword, $this->getRequestPassword());
+		// 		// Saves info on whether user clicked button or not.
+		// 		$this->cookies->save("Submitted", $this->didUserPressLoginButton());
+
+		// 		// Reloads page.				
+		// 	} 
+		// 	// On reload.
+		// 	else {			
+		// 		// Loads username and password from cookie and preforms log-in attempt.
+		// 		$isLoggedIn = $this->controller->login($this->getRequestUserNameCookie(),  $this->getRequestPasswordCookie());
+
+		// 		if($isLoggedIn) {
+		// 			$message = "Welcome";
+		// 			$response = $this->generateLogoutButtonHTML($message);
+
+		// 		} else {
+		// 			// var_dump(isset($_GET["index"]));
+		// 			// Only display message if submit-button is clicked.
+		// 			if ($this->cookies->load("Submitted") == "1") {
+		// 				$message = $this->controller->errorMessage;	
+		// 			}											
+		// 			$response = $this->generateLoginFormHTML($message);
+		// 		}
+		// 	}
+		// }
+
+		// return $response;
 	}
 
-	private function didUserPressLoginButton() {
+	public function didUserPressLoginButton() {
 		// If user has pressed submit button launch method response.
 		if (isset($_POST[self::$login]))
 			return true;
 		return false;
 	}
 
-	private function didUserPressLogoutButton() {
+	public function didUserPressLogoutButton() {
 		if (isset($_POST[self::$logout]))
 			return true;
 		return false;	
+	}
+
+	public function getMessage($message) {
+		return $message;
 	}
 
 	/**
@@ -145,14 +163,22 @@ class LoginView {
 		return isset($_POST[self::$password]) ? $_POST[self::$password] : "";
 	}
 
-	private function getRequestUserNameCookie() {
+	public function setUserNameCookie() {
+		$this->cookies->save(self::$cookieName, $this->getRequestUserName());
+	}
+
+	public function setPasswordCookie() {
+		$this->cookies->save(self::$cookiePassword, $this->getRequestPassword());
+	}
+
+	public function getRequestUserNameCookie() {
 		return $this->cookies->load(self::$cookieName);
 	}
 
-	private function getRequestPasswordCookie() {
+	public function getRequestPasswordCookie() {
 		return $this->cookies->load(self::$cookiePassword);
-	}
-
-
-	
+	}	
 }
+
+// 
+// $this->cookies->save(self::$cookiePassword, $this->getRequestPassword());

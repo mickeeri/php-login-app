@@ -1,73 +1,95 @@
 <?php
 
-session_start();
+
 
 require_once("model/LoginModel.php");
 require_once("view/LoginView.php");
-require_once("view/LayoutView.php");
+require_once('view/CookieStorage.php');
+require_once('model/UserModel.php');
 
 class LoginController {
 	// PROPERTIES
-	private $model;
+	private $loginModel;
 	private $layoutView;
-	public $errorMessage = "";
+	public static $message = 'LoginController::Message';
+	// private $userModel;
 
 	// CONSTRUCTOR
-	public function __construct() {
-		$this->model = new LoginModel();
-		$this->layoutView = new LayoutView();
-		$this->loginView = new LoginView($this);
-		$this->dateTimeView = new DateTimeView();
-
+	public function __construct(LoginModel $loginModel, LoginView $loginView) {		
+		$this->loginModel = $loginModel;
+		$this->loginView = $loginView;
+		$this->cookies = new CookieStorage();
 	}
 
 	// FUNCTIONS
+	public function isLoggedIn(){
+		// See if there is welcome or bye bye message.
+		$this->loginView->message = $this->cookies->load(self::$message);
 
-	public function isLoggedIn() {
-		// Flytta till model.
-		if(isset($_SESSION["Username"]))
-			return true;
-		return false;
-	}
+		if($this->loginModel->sessionIsSet()) {								
 
-	public function renderPage(){
-		// Flytta innehåll från response hit. 
-		$this->layoutView->render($this->isLoggedIn(), $this->loginView, $this->dateTimeView);
-	}
-	
-	public function login($userName, $password) {
-		try {
-			// Error handeling
-			if($userName == "") {
-				throw new Exception("Username is missing");
-			} elseif ($password == "") {
-				throw new Exception("Password is missing");
-			} else {
-				// Compares parameters with valid credentials in model.		
-				if($userName == $this->model->getCorrectUserName() && $password == $this->model->getCorrectPassword()) {
-					// Creates new session.
-					$_SESSION["Username"] = $userName;
-					// Reloads page.
-					header('Location: '.$_SERVER['PHP_SELF']);	
-					return true;
-				}
-				else {
-					throw new Exception("Wrong name or password");
-					return false;
+			if($this->loginView->didUserPressLogoutButton()) {
+				$this->loginModel->removeUserSession();
+			}
+
+			return true;			
+		} else {
+			if($this->loginView->didUserPressLoginButton()) {				
+				
+				$userName = $this->loginView->setUserNameCookie();
+				$password = $this->loginView->setPasswordCookie();
+
+				// $this->cookies->save('LoginView::CookieName', $this->loginView->getRequestUserName());
+
+
+
+				$isValid = $this->loginModel->authorize($userName, $password);
+
+				// $loginView->message = $this->loginModel->getMessage();
+
+				if($isValid) {					
+					$this->loginModel->createUserSession($userName);
+				} else {
+
 				}
 			}
-		
-			return false;
 
-		} catch(Exception $e) {
-			$this->errorMessage = $e->getMessage();
+			return false;
 		}
+	}
+	
+	public function login() {
+
+
+
+		// $userName = $loginView->getRequestUserNameCookie();
+		//$password = $loginView->getRequestPasswordCookie();
+		//
+		
+
+		// var_dump($userName);
+
+		// $this->model->authorize();
+
+		// 	// Compares parameters with valid credentials in model.		
+		// 	if($userName == $this->model->getCorrectUserName() && $password == $this->model->getCorrectPassword()) {
+
+		// 	}
+		// 	else {
+		// 		throw new Exception("Wrong name or password");
+		// 		return false;
+		// 	}
+		
+	
+		// return false;
+
+
 	}
 
 	public function logout() {
-		// Removes session.
-		unset($_SESSION["Username"]); // todo: tar bort strängberoende här.
-		// Reloads page.
-		header('Location: '.$_SERVER['PHP_SELF']);
+		// // Removes session.
+		// unset($_SESSION["Username"]); // todo: tar bort strängberoende här.
+		// // Reloads page.
+		// header('Location: '.$_SERVER['PHP_SELF']);
 	}
 }
