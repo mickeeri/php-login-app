@@ -12,10 +12,13 @@ class LoginView {
 	private static $cookiePassword = 'LoginView::CookiePassword';
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
-	public $message;
+	private static $cookieMessage = 'LoginView::CookieMessage';
+	private static $message; 
+	// public $message;
+	public $nameFieldValue;
 
 	public function __construct() {	
-		$this->cookies = new CookieStorage();
+		$this->cookieStorage = new CookieStorage();
 	}
 
 	/**
@@ -27,71 +30,22 @@ class LoginView {
 	 */
 	public function response($isLoggedIn) {
 		
-		$message = $this->message;
+		$message = "";		
+
+		// See if there is welcome- or bye-bye-message stored as cookie.
+		if($this->cookieStorage->load(self::$cookieMessage) !== "") {
+			$message = $this->cookieStorage->load(self::$cookieMessage);
+		} else {
+			$message = self::$message;
+		}
 
 		if($isLoggedIn) {
 			$response = $this->generateLogoutButtonHTML($message);
 		} else {
-			// Saves username and password in cookies.
-			// 
-			//header('Location: '.$_SERVER['PHP_SELF']);
-			
-			// $this->cookies->save(self::$cookieName, $this->getRequestUserName());
-			// $this->cookies->save(self::$cookiePassword, $this->getRequestPassword());
-
 			$response = $this->generateLoginFormHTML($message);
 		}
 
 		return $response;
-
-
-		// // User is logged in.
-		// if($this->controller->isLoggedIn()) {
-		// 	$response = $this->generateLogoutButtonHTML($message);
-
-		// 	//header('Location: '.$_SERVER['PHP_SELF']);
-
-		// 	if($this->didUserPressLogoutButton()) {
-		// 		$message = "Bye bye!";
-		// 		$this->controller->logout();
-		// 	}
-		// } 
-		// // User is not logged in.
-		// else {	
-		// 	$response = $this->generateLoginFormHTML($message);	
-		// 	// User has pressed login-button		
-		// 	if($this->didUserPressLoginButton()) {
-				
-		// 		header('Location: '.$_SERVER['PHP_SELF']);
-		// 		// Saves info in cookies.				
-		// 		$this->cookies->save(self::$cookieName, $this->getRequestUserName());
-		// 		$this->cookies->save(self::$cookiePassword, $this->getRequestPassword());
-		// 		// Saves info on whether user clicked button or not.
-		// 		$this->cookies->save("Submitted", $this->didUserPressLoginButton());
-
-		// 		// Reloads page.				
-		// 	} 
-		// 	// On reload.
-		// 	else {			
-		// 		// Loads username and password from cookie and preforms log-in attempt.
-		// 		$isLoggedIn = $this->controller->login($this->getRequestUserNameCookie(),  $this->getRequestPasswordCookie());
-
-		// 		if($isLoggedIn) {
-		// 			$message = "Welcome";
-		// 			$response = $this->generateLogoutButtonHTML($message);
-
-		// 		} else {
-		// 			// var_dump(isset($_GET["index"]));
-		// 			// Only display message if submit-button is clicked.
-		// 			if ($this->cookies->load("Submitted") == "1") {
-		// 				$message = $this->controller->errorMessage;	
-		// 			}											
-		// 			$response = $this->generateLoginFormHTML($message);
-		// 		}
-		// 	}
-		// }
-
-		// return $response;
 	}
 
 	public function didUserPressLoginButton() {
@@ -138,7 +92,7 @@ class LoginView {
 					<p id="' . self::$messageId . '">' . $message . '</p>
 					
 					<label for="' . self::$name . '">Username :</label>
-					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $this->getRequestUserNameCookie() . '" />
+					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $this->nameFieldValue  . '" />
 
 					<label for="' . self::$password . '">Password :</label>
 					<input type="password" id="' . self::$password . '" name="' . self::$password . '" />
@@ -146,7 +100,7 @@ class LoginView {
 					<label for="' . self::$keep . '">Keep me logged in  :</label>
 					<input type="checkbox" id="' . self::$keep . '" name="' . self::$keep . '" />
 					
-					<input type="submit" id="btnSubmit" name="' . self::$login . '" value="Login" />
+					<input type="submit" id="btnSubmit" name="' . self::$login . '" value="login" />
 				</fieldset>
 			</form>
 		';
@@ -155,30 +109,20 @@ class LoginView {
 	}
 	
 	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
-	private function getRequestUserName() {
+	public function getRequestUserName() {
 		return isset($_POST[self::$name]) ? $_POST[self::$name] : "";
 	}
 
-	private function getRequestPassword() {
+	public function getRequestPassword() {
 		return isset($_POST[self::$password]) ? $_POST[self::$password] : "";
 	}
 
-	public function setUserNameCookie() {
-		$this->cookies->save(self::$cookieName, $this->getRequestUserName());
+	public function setCookieMessage($message) {
+		$this->cookieStorage->save(self::$cookieMessage, $message);
+		// setcookie(self::$cookieMessage, $message, -1);
 	}
 
-	public function setPasswordCookie() {
-		$this->cookies->save(self::$cookiePassword, $this->getRequestPassword());
+	public function setMessage($message) {
+		self::$message = $message;
 	}
-
-	public function getRequestUserNameCookie() {
-		return $this->cookies->load(self::$cookieName);
-	}
-
-	public function getRequestPasswordCookie() {
-		return $this->cookies->load(self::$cookiePassword);
-	}	
 }
-
-// 
-// $this->cookies->save(self::$cookiePassword, $this->getRequestPassword());

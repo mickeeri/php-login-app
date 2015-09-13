@@ -4,7 +4,7 @@
 
 session_start();
 
-require_once('view/CookieStorage.php');
+// require_once('view/CookieStorage.php');
 
 /**
 * 
@@ -13,7 +13,8 @@ class LoginModel {
 
 	private $correctUserName;
 	private $correctPassword;
-	private static $session = "LoginModel::Session";
+	private static $userSession = "LoginModel::>UserSession";
+	private static $sessionMessage = "LoginModel::SessionMessage";
 	 
 	// private $isLoggedIn;
 	
@@ -24,7 +25,7 @@ class LoginModel {
 		$this->loginView = $loginView;
 		$this->setCorrectUserName();
 		$this->setCorrectPassword();
-		$this->cookies = new CookieStorage();
+		// $this->cookies = new CookieStorage();
 	}
 
 	private function setCorrectUserName() {
@@ -36,15 +37,16 @@ class LoginModel {
 	}
 
 	public function sessionIsSet() {
-		return isset($_SESSION[self::$session]);
+		return isset($_SESSION[self::$userSession]);
 	}
 
 	public function authorize($userName, $password) {
 		try {
 			if($userName == "") {
-				throw new Exception("Username is missing");
+				throw new Exception("Username is missing");			
 			} elseif ($password == "") {
-				throw new Exception("Password is missing");
+				$this->loginView->nameFieldValue = $userName;
+				throw new Exception("Password is missing");				
 			} elseif ($userName !== $this->correctUserName || $password !== $this->correctPassword) {
 				throw new Exception("Wrong name or password");
 			}
@@ -52,35 +54,41 @@ class LoginModel {
 		return true;
 			
 		} catch (Exception $e) {
-			$this->loginView->message = $e->getMessage(); 
+			$this->loginView->setMessage($e->getMessage()); 
 			return false;
 		}
 	}
 
-	public function getMessage() {
-		return $this->message;
-	}
-
 	public function createUserSession($userName) {
 		// Creates new session.
-		$_SESSION[self::$session] = $userName;
-		// Sets welcome message in cookie.
-		$this->cookies->save(LoginController::$message, "Welcome");
-		// Relaods page
-		header('Location: '.$_SERVER['PHP_SELF']);
+		$_SESSION[self::$userSession] = $userName;
 		
+		// Relaods page
+		// header("Location: http://me222wm.comuv.com/");	
+		// Sets welcome message in cookie.
+		$_SESSION[self::$sessionMessage] = "Welcome";
+		// $this->loginView->setCookieMessage("Welcome");
+		//$_SESSION["MessageSession"] = "Welcome";
+		header('Location: '.$_SERVER['REQUEST_URI']);
+		exit();
+	}
+
+	public function displayLoginLogoutMessages() {
+		if(isset($_SESSION[self::$sessionMessage])) {
+			$this->loginView->setMessage($_SESSION[self::$sessionMessage]);
+			unset($_SESSION[self::$sessionMessage]);
+		}
 	}
 
 	public function removeUserSession() {
-		unset($_SESSION[self::$session]);
+		unset($_SESSION[self::$userSession]);
 		// session_destroy();
-		// Sets bye bye cookie.
-		$this->cookies->save(LoginController::$message, "Bye bye!");
 		// Reloads page.
-		header('Location: '.$_SERVER['PHP_SELF']);
+	
+		// Sets bye bye cookie.	
+		//$this->loginView->setCookieMessage("Bye bye!");
+		$_SESSION[self::$sessionMessage] = "Bye bye!";
+		header('Location: '.$_SERVER['REQUEST_URI']);
+		exit();	
 	}
-
-	// public function setIsLoggedIn($isLoggedIn) {
-	// 	$this->isLoggedIn = $isLoggedIn;
-	// }
 }
