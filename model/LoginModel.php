@@ -13,8 +13,9 @@ class LoginModel {
 
 	private $correctUserName;
 	private $correctPassword;
-	private static $userSession = "LoginModel::>UserSession";
+	private static $userSession = "LoginModel::UserSession";
 	private static $sessionMessage = "LoginModel::SessionMessage";
+	public static $isLoggingInWithCookies = "LoginModel::isLoggingInWithCookies";
 	 
 	// private $isLoggedIn;
 	
@@ -29,11 +30,11 @@ class LoginModel {
 	}
 
 	private function setCorrectUserName() {
-		$this->correctUserName = "Admin";
+		$this->correctUserName = "admin";
 	}
 
 	private function setCorrectPassword() {
-		$this->correctPassword = "Password";
+		$this->correctPassword = "pass";
 	}
 
 	public function sessionIsSet() {
@@ -66,7 +67,12 @@ class LoginModel {
 		// Relaods page
 		// header("Location: http://me222wm.comuv.com/");	
 		// Sets welcome message in cookie.
-		$_SESSION[self::$sessionMessage] = "Welcome";
+		if(self::$isLoggingInWithCookies == true) {
+			$_SESSION[self::$sessionMessage] = "Welcome with cookies";
+		} else {
+			$_SESSION[self::$sessionMessage] = "Welcome";
+		}
+		
 		// $this->loginView->setCookieMessage("Welcome");
 		//$_SESSION["MessageSession"] = "Welcome";
 		header('Location: '.$_SERVER['REQUEST_URI']);

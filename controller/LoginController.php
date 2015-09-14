@@ -25,29 +25,50 @@ class LoginController {
 
 			// Logout
 			if($this->loginView->didUserPressLogoutButton()) {
+				$this->loginView->destroyCookies();
 				$this->loginModel->removeUserSession();
 			}
 
 			return true;
 
 		} else {
+			$userName = "";
+			$password = "";
+
+			// Check if credentials is stoored in cookies.
+			if($this->loginView->getUserNameCookie() !== NULL && $this->loginView->getPasswordCookie() !== NULL) {
+				$userName = $this->loginView->getUserNameCookie();
+				$password = $this->loginView->getPasswordCookie();
+				$this->loginModel->isLoggingInWithCookies = true;
+				$this->login($userName, $password);
+			} 
 			// Login
-			if($this->loginView->didUserPressLoginButton()) {				
+			elseif($this->loginView->didUserPressLoginButton()) {				
 				
 				// Gets credentials from view.
 				$userName = $this->loginView->getRequestUserName();
 				$password = $this->loginView->getRequestPassword();
 
-				// Calls method authorize in model. 
-				$isValid = $this->loginModel->authorize($userName, $password);
-
-				// Correct username and password.
-				if($isValid) {					
-					$this->loginModel->createUserSession($userName);
+				if($this->loginView->isKeepMeLoggedInChecked()) {
+					$this->loginView->setCookies($userName, $password);
+					header('Location: '.$_SERVER['REQUEST_URI']);
 				}
+
+				$this->loginModel->isLoggingInWithCookies = false;
+				$this->login($userName, $password);
 			}
 
 			return false;
+		}
+	}
+
+	public function login($userName, $password) {
+		// Calls method authorize in model. 
+		$isValid = $this->loginModel->authorize($userName, $password);
+
+		// Correct username and password.
+		if($isValid) {					
+			$this->loginModel->createUserSession($userName);
 		}
 	}
 }

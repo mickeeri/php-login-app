@@ -1,7 +1,6 @@
 <?php
 
 require_once('CookieStorage.php');
-require_once("controller/LoginController.php");
 
 class LoginView {
 	private static $login = 'LoginView::Login';
@@ -32,12 +31,14 @@ class LoginView {
 		
 		$message = "";		
 
-		// See if there is welcome- or bye-bye-message stored as cookie.
-		if($this->cookieStorage->load(self::$cookieMessage) !== "") {
-			$message = $this->cookieStorage->load(self::$cookieMessage);
-		} else {
-			$message = self::$message;
-		}
+		// // See if there is welcome- or bye-bye-message stored as cookie.
+		// if($this->cookieStorage->load(self::$cookieMessage) !== "") {
+		// 	$message = $this->cookieStorage->load(self::$cookieMessage);
+		// } else {
+		// 	$message = self::$message;
+		// }
+		// 
+		$message = self::$message;
 
 		if($isLoggedIn) {
 			$response = $this->generateLogoutButtonHTML($message);
@@ -56,9 +57,26 @@ class LoginView {
 	}
 
 	public function didUserPressLogoutButton() {
-		if (isset($_POST[self::$logout]))
+		if (isset($_POST[self::$logout]))		
 			return true;
 		return false;	
+	}
+
+	public function isKeepMeLoggedInChecked() {
+		return isset($_POST[self::$keep]);
+	}
+
+	public function getUserNameCookie() {
+		return isset($_COOKIE[self::$cookieName]) ? $_COOKIE[self::$cookieName] : NULL;
+	}
+
+	public function getPasswordCookie() {
+		return isset($_COOKIE[self::$cookiePassword]) ? $_COOKIE[self::$cookiePassword] : NULL;
+	}
+
+	public function destroyCookies() {
+		setcookie(self::$cookieName, "", time() - 1);
+		setcookie(self::$cookiePassword, "", time() - 1);
 	}
 
 	public function getMessage($message) {
@@ -117,12 +135,17 @@ class LoginView {
 		return isset($_POST[self::$password]) ? $_POST[self::$password] : "";
 	}
 
-	public function setCookieMessage($message) {
-		$this->cookieStorage->save(self::$cookieMessage, $message);
-		// setcookie(self::$cookieMessage, $message, -1);
-	}
+	// public function setCookieMessage($message) {
+	// 	$this->cookieStorage->save(self::$cookieMessage, $message);
+	// 	// setcookie(self::$cookieMessage, $message, -1);
+	// }
 
 	public function setMessage($message) {
 		self::$message = $message;
+	}
+
+	public function setCookies($userName, $password){
+		setcookie(self::$cookieName, $userName, strtotime( '+30 days' ));
+		setcookie(self::$cookiePassword, $password, strtotime( '+30 days' ));
 	}
 }
