@@ -15,7 +15,7 @@ class LoginModel {
 	private $correctPassword;
 	private static $userSession = "LoginModel::UserSession";
 	private static $sessionMessage = "LoginModel::SessionMessage";
-	public static $isLoggingInWithCookies = "LoginModel::isLoggingInWithCookies";
+	public $rememberMe = false;
 	 
 	// private $isLoggedIn;
 	
@@ -24,17 +24,17 @@ class LoginModel {
 	 */
 	public function __construct(LoginView $loginView) {
 		$this->loginView = $loginView;
-		$this->setCorrectUserName();
-		$this->setCorrectPassword();
+		$this->correctUserName = "admin";
+		$this->correctPassword = "pass";
 		// $this->cookies = new CookieStorage();
 	}
 
-	private function setCorrectUserName() {
-		$this->correctUserName = "admin";
-	}
+	// private function setCorrectUserName() {
+	// 	$this->correctUserName = "admin";
+	// }
 
-	private function setCorrectPassword() {
-		$this->correctPassword = "pass";
+	private function setCorrectPassword($newPassword) {
+		$this->correctPassword = $newPassword;
 	}
 
 	public function sessionIsSet() {
@@ -42,6 +42,8 @@ class LoginModel {
 	}
 
 	public function authorize($userName, $password) {
+		var_dump($this->correctPassword);
+
 		try {
 			if($userName == "") {
 				throw new Exception("Username is missing");			
@@ -60,15 +62,15 @@ class LoginModel {
 		}
 	}
 
-	public function createUserSession($userName) {
+	public function createUserSession($user, $password) {	
 		// Creates new session.
-		$_SESSION[self::$userSession] = $userName;
+		$_SESSION[self::$userSession] = $user;
 		
 		// Relaods page
-		// header("Location: http://me222wm.comuv.com/");	
 		// Sets welcome message in cookie.
-		if(self::$isLoggingInWithCookies == true) {
-			$_SESSION[self::$sessionMessage] = "Welcome with cookies";
+		if($this->rememberMe) {
+			$_SESSION[self::$sessionMessage] = "Welcome and you will be remembered";
+			$this->setCorrectPassword($password);
 		} else {
 			$_SESSION[self::$sessionMessage] = "Welcome";
 		}
@@ -86,15 +88,29 @@ class LoginModel {
 		}
 	}
 
-	public function removeUserSession() {
-		unset($_SESSION[self::$userSession]);
-		// session_destroy();
-		// Reloads page.
-	
-		// Sets bye bye cookie.	
-		//$this->loginView->setCookieMessage("Bye bye!");
-		$_SESSION[self::$sessionMessage] = "Bye bye!";
-		header('Location: '.$_SERVER['REQUEST_URI']);
-		exit();	
+	public function hasBeenRemembered($userIdentifier) {
+		$lines = @file("/model/LoginModel.txt");
+
+		if ($lines === false) {
+			return false;
+		}
+
+		foreach ($lines as $existingValue) {
+			$existingValue = trim($existingValue);
+			if ($existingValue === $userIdentifier) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public function remeberUser($userIdentifier) {
+		if ($this->hasBeenRemembered($userIdentifier)) {
+			return;
+		}
+
+		$fp = fopen("/model/LoginModel.txt"), 'a');
+		fwrite($fp, $userIdentifier . "\n");
 	}
 }

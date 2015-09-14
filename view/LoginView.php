@@ -71,7 +71,9 @@ class LoginView {
 	}
 
 	public function getPasswordCookie() {
-		return isset($_COOKIE[self::$cookiePassword]) ? $_COOKIE[self::$cookiePassword] : NULL;
+		$ret = isset($_COOKIE[self::$cookiePassword]) ? $_COOKIE[self::$cookiePassword] : NULL;
+		setcookie(self::$cookiePassword, $this->generateRandomString(), strtotime( '+30 days' ));
+		return $ret;
 	}
 
 	public function destroyCookies() {
@@ -147,5 +149,15 @@ class LoginView {
 	public function setCookies($userName, $password){
 		setcookie(self::$cookieName, $userName, strtotime( '+30 days' ));
 		setcookie(self::$cookiePassword, $password, strtotime( '+30 days' ));
+	}
+
+	private function generateRandomString($length = 30) {
+	    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	    $charactersLength = strlen($characters);
+	    $randomString = '';
+	    for ($i = 0; $i < $length; $i++) {
+	        $randomString .= $characters[rand(0, $charactersLength - 1)];
+	    }
+	    return $randomString;
 	}
 }
