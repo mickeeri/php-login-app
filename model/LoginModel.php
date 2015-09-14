@@ -42,7 +42,6 @@ class LoginModel {
 	}
 
 	public function authorize($userName, $password) {
-		var_dump($this->correctPassword);
 
 		try {
 			if($userName == "") {
@@ -62,15 +61,14 @@ class LoginModel {
 		}
 	}
 
-	public function createUserSession($user, $password) {	
+	public function createUserSession($user) {	
 		// Creates new session.
 		$_SESSION[self::$userSession] = $user;
 		
 		// Relaods page
 		// Sets welcome message in cookie.
-		if($this->rememberMe) {
+		if(true) {
 			$_SESSION[self::$sessionMessage] = "Welcome and you will be remembered";
-			$this->setCorrectPassword($password);
 		} else {
 			$_SESSION[self::$sessionMessage] = "Welcome";
 		}
@@ -89,7 +87,7 @@ class LoginModel {
 	}
 
 	public function hasBeenRemembered($userIdentifier) {
-		$lines = @file("/model/LoginModel.txt");
+		$lines = @file("model/LoginModel.txt");
 
 		if ($lines === false) {
 			return false;
@@ -105,12 +103,29 @@ class LoginModel {
 		return false;
 	}
 
-	public function remeberUser($userIdentifier) {
-		if ($this->hasBeenRemembered($userIdentifier)) {
-			return;
-		}
+	public function rememberUser($userIdentifier) {
+		// if ($this->hasBeenRemembered($userIdentifier)) {
+		// 	return;
+		// }
 
-		$fp = fopen("/model/LoginModel.txt"), 'a');
+		$fp = fopen("model/LoginModel.txt", 'a');
 		fwrite($fp, $userIdentifier . "\n");
+	}
+
+	public function forgetUser() {
+		$fp = fopen("model/LoginModel.txt", 'r+');
+		@ftruncate($fp, 0);
+	}
+
+	public function removeUserSession() {
+		unset($_SESSION[self::$userSession]);
+		// session_destroy();
+		// Reloads page.
+	
+		// Sets bye bye cookie.	
+		//$this->loginView->setCookieMessage("Bye bye!");
+		$_SESSION[self::$sessionMessage] = "Bye bye!";
+		header('Location: '.$_SERVER['REQUEST_URI']);
+		exit();	
 	}
 }

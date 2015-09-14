@@ -151,6 +151,11 @@ class LoginView {
 		setcookie(self::$cookiePassword, $password, strtotime( '+30 days' ));
 	}
 
+	public function getClientIdentifier() {
+		return $this->getRequestUserName();
+	}
+
+	// From stackoverflow.
 	private function generateRandomString($length = 30) {
 	    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	    $charactersLength = strlen($characters);

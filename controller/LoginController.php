@@ -17,6 +17,15 @@ class LoginController {
 
 		$this->loginModel->displayLoginLogoutMessages();
 
+		if($this->loginModel->hasBeenRemembered($this->loginView->getUserNameCookie())) {
+			// Duplication of code. 
+			if($this->loginView->didUserPressLogoutButton()) {
+				$this->loginModel->forgetUser();
+			}
+
+			return true;
+		}
+
 		// If session is set return true;
 		if($this->loginModel->sessionIsSet()) {								
 
@@ -33,7 +42,9 @@ class LoginController {
 			$userName = $this->loginView->getUserNameCookie();
 			$password = $this->loginView->getPasswordCookie();
 			if ($this->loginModel->authorize($userName, $password)) {
-				$this->loginModel->createUserSession($userName, $password);
+				$this->loginModel->rememberUser($userName);
+				// $clientIdentifier = $this->loginView->getClientIdentifier();
+				$this->loginModel->createUserSession($userName);
 			} else {
 				$this->loginView->destroyCookies();
 				return false;
@@ -41,18 +52,6 @@ class LoginController {
 		}
 
 		else {
-			// $userName = "";
-			// $password = "";
-
-			// // Check if credentials is stoored in cookies.
-			// if($this->loginView->getUserNameCookie() !== NULL && $this->loginView->getPasswordCookie() !== NULL) {
-			// 	$userName = $this->loginView->getUserNameCookie();
-			// 	$password = $this->loginView->getPasswordCookie();
-			// 	$this->loginModel->rememberMe = true;
-			// 	$this->loginModel->createUserSession($userName, $password);
-			// 	// $this->login($userName, $password);
-			// } 
-			// Login
 			if($this->loginView->didUserPressLoginButton()) {				
 				
 				// Gets credentials from view.
@@ -60,7 +59,7 @@ class LoginController {
 				$password = $this->loginView->getRequestPassword();
 
 				if($this->loginView->isKeepMeLoggedInChecked()) {
-					$this->loginView->setCookies($userName, $password);
+					$this->loginView->setCookies($userName, $password);					
 					header('Location: '.$_SERVER['REQUEST_URI']);
 					// $this->loginModel->rememberMe = true;
 					// $this->login($this->loginView->getUserNameCookie(), $this->loginView->getPasswordCookie());
