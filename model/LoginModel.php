@@ -67,13 +67,13 @@ class LoginModel {
 		
 		// Relaods page
 		// Sets welcome message in cookie.
-		if(true) {
-			$_SESSION[self::$sessionMessage] = "Welcome and you will be remembered";
-		} else {
-			$_SESSION[self::$sessionMessage] = "Welcome";
-		}
+		// if($this->rememberedMe) {
+		// 	$_SESSION[self::$sessionMessage] = "Welcome and you will be remembered";
+		// } else {
+		// 	$_SESSION[self::$sessionMessage] = "Welcome";
+		// }
 		
-		// $this->loginView->setCookieMessage("Welcome");
+		
 		//$_SESSION["MessageSession"] = "Welcome";
 		header('Location: '.$_SERVER['REQUEST_URI']);
 		exit();
@@ -103,13 +103,13 @@ class LoginModel {
 		return false;
 	}
 
-	public function rememberUser($userIdentifier) {
+	public function rememberUser($userIdentifier, $password) {
 		// if ($this->hasBeenRemembered($userIdentifier)) {
 		// 	return;
 		// }
 
 		$fp = fopen("model/LoginModel.txt", 'a');
-		fwrite($fp, $userIdentifier . "\n");
+		fwrite($fp, $userIdentifier . "\n" . $password);
 	}
 
 	public function forgetUser() {
@@ -123,8 +123,8 @@ class LoginModel {
 		// Reloads page.
 	
 		// Sets bye bye cookie.	
-		//$this->loginView->setCookieMessage("Bye bye!");
-		$_SESSION[self::$sessionMessage] = "Bye bye!";
+		$this->loginView->setCookieMessage("Bye bye!");
+		//$_SESSION[self::$sessionMessage] = "Bye bye!";
 		header('Location: '.$_SERVER['REQUEST_URI']);
 		exit();	
 	}

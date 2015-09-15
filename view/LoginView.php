@@ -29,16 +29,15 @@ class LoginView {
 	 */
 	public function response($isLoggedIn) {
 		
-		$message = "";		
-
-		// // See if there is welcome- or bye-bye-message stored as cookie.
-		// if($this->cookieStorage->load(self::$cookieMessage) !== "") {
-		// 	$message = $this->cookieStorage->load(self::$cookieMessage);
-		// } else {
-		// 	$message = self::$message;
-		// }
-		// 
 		$message = self::$message;
+		//$message = "";		
+
+		// See if there is welcome- or bye-bye-message stored as cookie.
+		if($this->cookieStorage->load(self::$cookieMessage) !== "") {
+			$message = $this->cookieStorage->load(self::$cookieMessage);
+		}
+		
+		//$message = self::$message;
 
 		if($isLoggedIn) {
 			$response = $this->generateLogoutButtonHTML($message);
@@ -137,10 +136,10 @@ class LoginView {
 		return isset($_POST[self::$password]) ? $_POST[self::$password] : "";
 	}
 
-	// public function setCookieMessage($message) {
-	// 	$this->cookieStorage->save(self::$cookieMessage, $message);
-	// 	// setcookie(self::$cookieMessage, $message, -1);
-	// }
+	public function setCookieMessage($message) {
+		//$this->cookieStorage->save(self::$cookieMessage, $message);
+		setcookie(self::$cookieMessage, $message, -1);
+	}
 
 	public function setMessage($message) {
 		self::$message = $message;

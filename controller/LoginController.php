@@ -15,12 +15,21 @@ class LoginController {
 	// FUNCTIONS
 	public function isLoggedIn(){
 
-		$this->loginModel->displayLoginLogoutMessages();
+		//$this->loginModel->displayLoginLogoutMessages();
 
 		if($this->loginModel->hasBeenRemembered($this->loginView->getUserNameCookie())) {
+			if($this->loginModel->sessionIsSet() === false) {
+				$this->loginView->setCookieMessage("Welcome back with cookie");
+				$this->loginModel->createUserSession($this->loginView->getUserNameCookie());
+			}
+
+			$this->loginView->getPasswordCookie();
+			
 			// Duplication of code. 
 			if($this->loginView->didUserPressLogoutButton()) {
 				$this->loginModel->forgetUser();
+				$this->loginView->destroyCookies();
+				$this->loginModel->removeUserSession();
 			}
 
 			return true;
@@ -31,6 +40,7 @@ class LoginController {
 
 			// Logout
 			if($this->loginView->didUserPressLogoutButton()) {
+				$this->loginModel->forgetUser();
 				$this->loginView->destroyCookies();
 				$this->loginModel->removeUserSession();
 			}
@@ -38,10 +48,12 @@ class LoginController {
 			return true;
 		}
 		elseif ($this->loginView->getUserNameCookie() !== NULL) {
-			$this->loginModel->rememberMe = true;
+			// $this->loginModel->rememberMe = true;
 			$userName = $this->loginView->getUserNameCookie();
 			$password = $this->loginView->getPasswordCookie();
+			
 			if ($this->loginModel->authorize($userName, $password)) {
+				
 				$this->loginModel->rememberUser($userName);
 				// $clientIdentifier = $this->loginView->getClientIdentifier();
 				$this->loginModel->createUserSession($userName);
@@ -59,12 +71,15 @@ class LoginController {
 				$password = $this->loginView->getRequestPassword();
 
 				if($this->loginView->isKeepMeLoggedInChecked()) {
-					$this->loginView->setCookies($userName, $password);					
+					$this->loginView->setCookies($userName, $password);
+					$this->loginView->setCookieMessage("Welcome and you will be remembered");					
 					header('Location: '.$_SERVER['REQUEST_URI']);
+					exit();
 					// $this->loginModel->rememberMe = true;
 					// $this->login($this->loginView->getUserNameCookie(), $this->loginView->getPasswordCookie());
 				} else {
-					$this->loginModel->rememberMe = false;
+					// $this->loginModel->rememberMe = false;
+					$this->loginView->setCookieMessage("Welcome");
 					$this->login($userName, $password);
 				}
 			}
