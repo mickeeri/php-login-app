@@ -79,10 +79,21 @@ class LoginModel {
 			return false;
 		}
 
+		// Reading file.
+		$line = @file($this->getFileName($user, $password));		
+		$expirationTime = $line[0];
+
+		// Return false if user remember time is expired. 
+		if(time() > $expirationTime) {
+			return false;
+		}
+
+
 		// var_dump(file_exists($this->getFileName($user)));
 		return file_exists($this->getFileName($user, $password));
 
 		// $lines = @file("data/rememberedUser.txt");
+		
 
 		// if ($lines === false) {
 		// 	return false;
@@ -98,7 +109,7 @@ class LoginModel {
 		// return false;
 	}
 
-	public function rememberUser($user, $password) {
+	public function rememberUser($user, $password, $rememberExpiration) {
 		// var_dump($user);
 
 		// if ($this->hasBeenRemembered($user)) {
@@ -111,6 +122,10 @@ class LoginModel {
 		// fwrite($fp, $user . "\n");
 		// 
 		file_put_contents($this->getFileName($user, $password), "");
+
+		// Saving how long user will be remembered in file. 
+		$fp = fopen($this->getFileName($user, $password),'a');
+		fwrite($fp, $rememberExpiration . "\n");
 	}
 
 	public function getFileName($user, $password) {
@@ -120,7 +135,15 @@ class LoginModel {
 	public function forgetUser($user, $password) {
 		// $fp = fopen("data/rememberedUser.txt", 'r+');
 		// @ftruncate($fp, 0);
-		unlink($this->getFileName($user, $password));
+		//unlink($this->getFileName($user, $password));
+
+		// http://stackoverflow.com/questions/4594180/deleting-all-files-from-a-folder-using-php
+		$files = glob(self::$folder . '*');
+		foreach ($files as $file) {
+			if(is_file($file)) {
+				unlink($file);
+			}
+		}
 	}
 
 	public function removeUserSession() {

@@ -28,7 +28,17 @@ class LoginView {
 	 * @return  void BUT writes to standard output and cookies!
 	 */
 	public function response($isLoggedIn) {
+		//var_dump(isset($_COOKIE[self::$cookieName]));
 		
+		// if(isset($_COOKIE[self::$cookieName])) {
+		// 	$userName = $_COOKIE[self::$cookieName];
+		// 	$password = $_COOKIE[self::$cookiePassword];
+
+		// 	$this->destroyCookies();
+
+		// 	$this->setCookies($userName, $password);
+		// }
+
 		$message = self::$message;
 		//$message = "";		
 
@@ -145,9 +155,11 @@ class LoginView {
 		self::$message = $message;
 	}
 
-	public function setCookies($userName, $password){
-		setcookie(self::$cookieName, $userName, strtotime( '+30 days' ));
-		setcookie(self::$cookiePassword, $password, strtotime( '+30 days' ));
+	public function setCookies($userName, $password, $cookieExpirationTime){
+		// setcookie(self::$cookieName, $userName, strtotime( '+30 days' ));
+		// setcookie(self::$cookiePassword, $password, strtotime( '+30 days' ));
+		setcookie(self::$cookieName, $userName, $cookieExpirationTime);
+		setcookie(self::$cookiePassword, $password, $cookieExpirationTime);
 	}
 
 	public function getClientIdentifier() {
@@ -166,6 +178,7 @@ class LoginView {
 	}
 
 	public function reloadPage($messageType) {
+		// TODO: Meddelandetyper i variabler. Egen klass?
 		if($messageType === "logout") {
 			$this->setCookieMessage("Bye bye!");
 		} elseif ($messageType === "regular-login") {
@@ -174,6 +187,9 @@ class LoginView {
 			$this->setCookieMessage("Welcome and you will be remembered");
 		} elseif($messageType === "welcome-back-login") {
 			$this->setCookieMessage("Welcome back with cookie");
+		} elseif ($messageType === "manipulated-cookie") {
+			//setcookie(self::$cookiePassword, "", time() - 1);
+			$this->setCookieMessage("Wrong information in cookies");
 		}
 
 		header('Location: '.$_SERVER['REQUEST_URI']);

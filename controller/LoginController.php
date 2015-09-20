@@ -22,7 +22,7 @@ class LoginController {
 
 			// Logout
 			if($this->loginView->didUserPressLogoutButton()) {
-				return $this->logout();
+				return $this->logout("logout");
 			}
 
 			return true;
@@ -32,6 +32,8 @@ class LoginController {
 
 		elseif($loginModel->hasBeenRemembered($loginView->getUserNameCookie(), $loginView->getPasswordCookie())) {
 			
+			
+
 			//$this->loginView->setCookieMessage("Welcome back with cookie");
 			$this->loginModel->createUserSession($this->loginView->getUserNameCookie());
 			$loginView->reloadPage("welcome-back-login");
@@ -55,22 +57,26 @@ class LoginController {
 
 			return true;
 		}
+		// Cookies exists but don't pass the hasBeenRemembered method.
+		elseif ($loginView->getUserNameCookie() !== NULL) {
+			
+			$this->logout("manipulated-cookie");
 
-		// elseif ($loginView->getUserNameCookie() !== NULL) {
+			//return false;
+
+			// $userName = $this->loginView->getUserNameCookie();
+			// $password = $this->loginView->getPasswordCookie();
 			
-		// 	// $userName = $this->loginView->getUserNameCookie();
-		// 	// $password = $this->loginView->getPasswordCookie();
-			
-		// 	// if ($this->loginModel->authorize($userName, $password)) {
+			// if ($this->loginModel->authorize($userName, $password)) {
 				
-		// 	// 	$this->loginModel->rememberUser($userName, $loginView->getPasswordCookie);
+			// 	$this->loginModel->rememberUser($userName, $loginView->getPasswordCookie);
 				
-		// 	// 	$this->login($userName, $password, "login-cookie");
-		// 	// } else {
-		// 	// 	$this->loginView->destroyCookies();
-		// 	// 	return false;
-		// 	// }			
-		// }
+			// 	$this->login($userName, $password, "login-cookie");
+			// } else {
+			// 	$this->loginView->destroyCookies();
+			// 	return false;
+			// }			
+		}
 
 		else {
 			// User makes login attempt.
@@ -86,9 +92,10 @@ class LoginController {
 					//$this->loginView->setCookies($userName, $password);
 					
 					if ($loginModel->authorize($userName, $password)) {
+						$cookieExpirationTime = time()+20;
 						$ranomStringPassword = sha1(rand());
-						$this->loginView->setCookies($userName, $ranomStringPassword);
-						$loginModel->rememberUser($userName, $ranomStringPassword);
+						$this->loginView->setCookies($userName, $ranomStringPassword, $cookieExpirationTime);
+						$loginModel->rememberUser($userName, $ranomStringPassword, $cookieExpirationTime);
 						return $this->login($userName, $password, "login-cookie");
 					}
 					//$this->loginView->reloadPage();											
@@ -112,11 +119,11 @@ class LoginController {
 		return false;
 	}
 
-	private function logout() {
+	private function logout($message) {
 		$this->loginModel->forgetUser($this->loginView->getUserNameCookie(), $this->loginView->getPasswordCookie());
 		$this->loginModel->removeUserSession();
 		$this->loginView->destroyCookies();
-		$this->loginView->reloadPage("logout");
+		$this->loginView->reloadPage($message);
 
 		return false;
 	}
