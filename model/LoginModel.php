@@ -15,7 +15,8 @@ class LoginModel {
 	private $correctPassword;
 	private static $userSession = "LoginModel::UserSession";
 	private static $sessionMessage = "LoginModel::SessionMessage";
-	public $rememberMe = false;
+	private static $folder = "data/";
+	// public $rememberMe = false;
 	 
 	// private $isLoggedIn;
 	
@@ -64,57 +65,62 @@ class LoginModel {
 	public function createUserSession($user) {	
 		// Creates new session.
 		$_SESSION[self::$userSession] = $user;
-		
-		// Relaods page
-		// Sets welcome message in cookie.
-		// if($this->rememberedMe) {
-		// 	$_SESSION[self::$sessionMessage] = "Welcome and you will be remembered";
-		// } else {
-		// 	$_SESSION[self::$sessionMessage] = "Welcome";
-		// }
-		
-		
-		//$_SESSION["MessageSession"] = "Welcome";
-		header('Location: '.$_SERVER['REQUEST_URI']);
-		exit();
 	}
 
-	public function displayLoginLogoutMessages() {
-		if(isset($_SESSION[self::$sessionMessage])) {
-			$this->loginView->setMessage($_SESSION[self::$sessionMessage]);
-			unset($_SESSION[self::$sessionMessage]);
-		}
-	}
+	// public function displayLoginLogoutMessages() {
+	// 	if(isset($_SESSION[self::$sessionMessage])) {
+	// 		$this->loginView->setMessage($_SESSION[self::$sessionMessage]);
+	// 		unset($_SESSION[self::$sessionMessage]);
+	// 	}
+	// }
 
-	public function hasBeenRemembered($userIdentifier) {
-		$lines = @file("model/LoginModel.txt");
-
-		if ($lines === false) {
+	public function hasBeenRemembered($user, $password) {
+		if ($user === null) {
 			return false;
 		}
 
-		foreach ($lines as $existingValue) {
-			$existingValue = trim($existingValue);
-			if ($existingValue === $userIdentifier) {
-				return true;
-			}
-		}
+		// var_dump(file_exists($this->getFileName($user)));
+		return file_exists($this->getFileName($user, $password));
 
-		return false;
+		// $lines = @file("data/rememberedUser.txt");
+
+		// if ($lines === false) {
+		// 	return false;
+		// }
+
+		// foreach ($lines as $existingValue) {
+		// 	$existingValue = trim($existingValue);
+		// 	if ($existingValue === $rememberToken) {
+		// 		return true;
+		// 	}
+		// }
+
+		// return false;
 	}
 
-	public function rememberUser($userIdentifier, $password) {
-		// if ($this->hasBeenRemembered($userIdentifier)) {
+	public function rememberUser($user, $password) {
+		// var_dump($user);
+
+		// if ($this->hasBeenRemembered($user)) {
 		// 	return;
 		// }
 
-		$fp = fopen("model/LoginModel.txt", 'a');
-		fwrite($fp, $userIdentifier . "\n" . $password);
+		//file_put_contents("data/rememberedUser.txt", "");
+
+		// $fp = fopen("data/rememberedUser.txt", 'a');
+		// fwrite($fp, $user . "\n");
+		// 
+		file_put_contents($this->getFileName($user, $password), "");
 	}
 
-	public function forgetUser() {
-		$fp = fopen("model/LoginModel.txt", 'r+');
-		@ftruncate($fp, 0);
+	public function getFileName($user, $password) {
+		return self::$folder . $user . '_' . $password;
+	}
+
+	public function forgetUser($user, $password) {
+		// $fp = fopen("data/rememberedUser.txt", 'r+');
+		// @ftruncate($fp, 0);
+		unlink($this->getFileName($user, $password));
 	}
 
 	public function removeUserSession() {
@@ -122,10 +128,10 @@ class LoginModel {
 		// session_destroy();
 		// Reloads page.
 	
-		// Sets bye bye cookie.	
-		$this->loginView->setCookieMessage("Bye bye!");
-		//$_SESSION[self::$sessionMessage] = "Bye bye!";
-		header('Location: '.$_SERVER['REQUEST_URI']);
-		exit();	
+		// // Sets bye bye cookie.	
+		// $this->loginView->setCookieMessage("Bye bye!");
+		// //$_SESSION[self::$sessionMessage] = "Bye bye!";
+		// header('Location: '.$_SERVER['REQUEST_URI']);
+		// exit();	
 	}
 }

@@ -15,55 +15,65 @@ class LoginController {
 	// FUNCTIONS
 	public function isLoggedIn(){
 
-		//$this->loginModel->displayLoginLogoutMessages();
+		$loginView = $this->loginView;
+		$loginModel = $this->loginModel;
 
-		if($this->loginModel->hasBeenRemembered($this->loginView->getUserNameCookie())) {
-			if($this->loginModel->sessionIsSet() === false) {
-				$this->loginView->setCookieMessage("Welcome back with cookie");
-				$this->loginModel->createUserSession($this->loginView->getUserNameCookie());
-			}
-
-			$this->loginView->getPasswordCookie();
-			
-			// Duplication of code. 
-			if($this->loginView->didUserPressLogoutButton()) {
-				$this->loginModel->forgetUser();
-				$this->loginView->destroyCookies();
-				$this->loginModel->removeUserSession();
-			}
-
-			return true;
-		}
-
-		// If session is set return true;
 		if($this->loginModel->sessionIsSet()) {								
 
 			// Logout
 			if($this->loginView->didUserPressLogoutButton()) {
-				$this->loginModel->forgetUser();
-				$this->loginView->destroyCookies();
-				$this->loginModel->removeUserSession();
+				return $this->logout();
 			}
 
 			return true;
 		}
-		elseif ($this->loginView->getUserNameCookie() !== NULL) {
-			// $this->loginModel->rememberMe = true;
-			$userName = $this->loginView->getUserNameCookie();
-			$password = $this->loginView->getPasswordCookie();
+
+		//$this->loginModel->displayLoginLogoutMessages();
+
+		elseif($loginModel->hasBeenRemembered($loginView->getUserNameCookie(), $loginView->getPasswordCookie())) {
 			
-			if ($this->loginModel->authorize($userName, $password)) {
-				
-				$this->loginModel->rememberUser($userName);
-				// $clientIdentifier = $this->loginView->getClientIdentifier();
-				$this->loginModel->createUserSession($userName);
-			} else {
-				$this->loginView->destroyCookies();
-				return false;
-			}			
+			//$this->loginView->setCookieMessage("Welcome back with cookie");
+			$this->loginModel->createUserSession($this->loginView->getUserNameCookie());
+			$loginView->reloadPage("welcome-back-login");
+			
+			// if($this->loginModel->sessionIsSet() === false) {
+			// 	// print("Hej!");
+			// 	// exit();
+			// 	$this->loginView->setCookieMessage("Welcome back with cookie");
+			// 	$this->loginModel->createUserSession($this->loginView->getUserNameCookie());
+			// }
+
+			//$this->loginView->getPasswordCookie();
+			
+			// // Duplication of code. 
+			// if($this->loginView->didUserPressLogoutButton()) {
+			// 	//$this->logout();
+			// 	// $this->loginModel->forgetUser();
+			// 	// $this->loginView->destroyCookies();
+			// 	// $this->loginModel->removeUserSession();
+			// }
+
+			return true;
 		}
 
+		// elseif ($loginView->getUserNameCookie() !== NULL) {
+			
+		// 	// $userName = $this->loginView->getUserNameCookie();
+		// 	// $password = $this->loginView->getPasswordCookie();
+			
+		// 	// if ($this->loginModel->authorize($userName, $password)) {
+				
+		// 	// 	$this->loginModel->rememberUser($userName, $loginView->getPasswordCookie);
+				
+		// 	// 	$this->login($userName, $password, "login-cookie");
+		// 	// } else {
+		// 	// 	$this->loginView->destroyCookies();
+		// 	// 	return false;
+		// 	// }			
+		// }
+
 		else {
+			// User makes login attempt.
 			if($this->loginView->didUserPressLoginButton()) {				
 				
 				// Gets credentials from view.
@@ -71,26 +81,43 @@ class LoginController {
 				$password = $this->loginView->getRequestPassword();
 
 				if($this->loginView->isKeepMeLoggedInChecked()) {
-					$this->loginView->setCookies($userName, $password);
-					$this->loginView->setCookieMessage("Welcome and you will be remembered");					
-					header('Location: '.$_SERVER['REQUEST_URI']);
-					exit();
-					// $this->loginModel->rememberMe = true;
-					// $this->login($this->loginView->getUserNameCookie(), $this->loginView->getPasswordCookie());
+					// Sets cookies and then reloads page.
+					
+					//$this->loginView->setCookies($userName, $password);
+					
+					if ($loginModel->authorize($userName, $password)) {
+						$ranomStringPassword = sha1(rand());
+						$this->loginView->setCookies($userName, $ranomStringPassword);
+						$loginModel->rememberUser($userName, $ranomStringPassword);
+						return $this->login($userName, $password, "login-cookie");
+					}
+					//$this->loginView->reloadPage();											
 				} else {
-					// $this->loginModel->rememberMe = false;
-					$this->loginView->setCookieMessage("Welcome");
-					$this->login($userName, $password);
+					return $this->login($userName, $password, "regular-login");
 				}
 			}
 			return false;
 		}
 	}
 
-	public function login($userName, $password) {
+	public function login($userName, $password, $messageType) {
 		// Calls method authorize in model. 
 		if($this->loginModel->authorize($userName, $password)) {					
 			$this->loginModel->createUserSession($userName);
+			$this->loginView->reloadPage($messageType);
+
+			return true;
 		}
+
+		return false;
+	}
+
+	private function logout() {
+		$this->loginModel->forgetUser($this->loginView->getUserNameCookie(), $this->loginView->getPasswordCookie());
+		$this->loginModel->removeUserSession();
+		$this->loginView->destroyCookies();
+		$this->loginView->reloadPage("logout");
+
+		return false;
 	}
 }

@@ -71,7 +71,7 @@ class LoginView {
 
 	public function getPasswordCookie() {
 		$ret = isset($_COOKIE[self::$cookiePassword]) ? $_COOKIE[self::$cookiePassword] : NULL;
-		setcookie(self::$cookiePassword, $this->generateRandomString(), strtotime( '+30 days' ));
+		//setcookie(self::$cookiePassword, $this->generateRandomString(), strtotime( '+30 days' ));
 		return $ret;
 	}
 
@@ -163,5 +163,20 @@ class LoginView {
 	        $randomString .= $characters[rand(0, $charactersLength - 1)];
 	    }
 	    return $randomString;
+	}
+
+	public function reloadPage($messageType) {
+		if($messageType === "logout") {
+			$this->setCookieMessage("Bye bye!");
+		} elseif ($messageType === "regular-login") {
+			$this->setCookieMessage("Welcome");
+		} elseif ($messageType === "login-cookie") {
+			$this->setCookieMessage("Welcome and you will be remembered");
+		} elseif($messageType === "welcome-back-login") {
+			$this->setCookieMessage("Welcome back with cookie");
+		}
+
+		header('Location: '.$_SERVER['REQUEST_URI']);
+		exit();	
 	}
 }
