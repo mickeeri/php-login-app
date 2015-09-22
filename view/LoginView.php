@@ -162,9 +162,9 @@ class LoginView {
 		setcookie(self::$cookiePassword, $password, $cookieExpirationTime);
 	}
 
-	public function getClientIdentifier() {
-		return $this->getRequestUserName();
-	}
+	// public function getClientIdentifier() {
+	// 	return $this->getRequestUserName();
+	// }
 
 	// From stackoverflow.
 	private function generateRandomString($length = 30) {
@@ -194,5 +194,9 @@ class LoginView {
 
 		header('Location: '.$_SERVER['REQUEST_URI']);
 		exit();	
+	}
+
+	public function getClientIdentifier() {
+		return $_SERVER["HTTP_USER_AGENT"];
 	}
 }

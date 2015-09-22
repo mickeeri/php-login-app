@@ -18,7 +18,9 @@ class LoginController {
 		$loginView = $this->loginView;
 		$loginModel = $this->loginModel;
 
-		if($this->loginModel->sessionIsSet()) {								
+		$client = $loginView->getClientIdentifier();
+
+		if($this->loginModel->sessionIsSet($client)) {								
 
 			// Logout
 			if($this->loginView->didUserPressLogoutButton()) {
@@ -35,7 +37,7 @@ class LoginController {
 			
 
 			//$this->loginView->setCookieMessage("Welcome back with cookie");
-			$this->loginModel->createUserSession($this->loginView->getUserNameCookie());
+			$this->loginModel->createUserSession($this->loginView->getUserNameCookie(), $client);
 			$loginView->reloadPage("welcome-back-login");
 			
 			// if($this->loginModel->sessionIsSet() === false) {
@@ -93,24 +95,24 @@ class LoginController {
 					
 					if ($loginModel->authorize($userName, $password)) {
 						$cookieExpirationTime = time()+20;
-						$ranomStringPassword = sha1(rand());
-						$this->loginView->setCookies($userName, $ranomStringPassword, $cookieExpirationTime);
-						$loginModel->rememberUser($userName, $ranomStringPassword, $cookieExpirationTime);
-						return $this->login($userName, $password, "login-cookie");
+						$randomStringPassword = sha1(rand());
+						$this->loginView->setCookies($userName, $randomStringPassword, $cookieExpirationTime);
+						$loginModel->rememberUser($userName, $randomStringPassword, $cookieExpirationTime);
+						return $this->login($userName, $password, $client, "login-cookie");
 					}
 					//$this->loginView->reloadPage();											
 				} else {
-					return $this->login($userName, $password, "regular-login");
+					return $this->login($userName, $password, $client, "regular-login");
 				}
 			}
 			return false;
 		}
 	}
 
-	public function login($userName, $password, $messageType) {
+	public function login($userName, $password, $client, $messageType) {
 		// Calls method authorize in model. 
 		if($this->loginModel->authorize($userName, $password)) {					
-			$this->loginModel->createUserSession($userName);
+			$this->loginModel->createUserSession($userName, $client);
 			$this->loginView->reloadPage($messageType);
 
 			return true;

@@ -14,7 +14,8 @@ class LoginModel {
 	private $correctUserName;
 	private $correctPassword;
 	private static $userSession = "LoginModel::UserSession";
-	private static $sessionMessage = "LoginModel::SessionMessage";
+	private static $userClientSession = "LoginModel::UserClientSession";
+	// private static $sessionMessage = "LoginModel::SessionMessage";
 	private static $folder = "data/";
 	// public $rememberMe = false;
 	 
@@ -25,8 +26,8 @@ class LoginModel {
 	 */
 	public function __construct(LoginView $loginView) {
 		$this->loginView = $loginView;
-		$this->correctUserName = "admin";
-		$this->correctPassword = "pass";
+		$this->correctUserName = "Admin";
+		$this->correctPassword = "Password";
 		// $this->cookies = new CookieStorage();
 	}
 
@@ -38,8 +39,12 @@ class LoginModel {
 		$this->correctPassword = $newPassword;
 	}
 
-	public function sessionIsSet() {
-		return isset($_SESSION[self::$userSession]);
+	public function sessionIsSet($client) {
+
+		if(isset($_SESSION[self::$userSession]) && $_SESSION[self::$userClientSession] === $client)
+			return true;
+		else
+			return false;
 	}
 
 	public function authorize($userName, $password) {
@@ -62,8 +67,9 @@ class LoginModel {
 		}
 	}
 
-	public function createUserSession($user) {	
+	public function createUserSession($user, $client) {	
 		// Creates new session.
+		$_SESSION[self::$userClientSession] = $client;
 		$_SESSION[self::$userSession] = $user;
 	}
 
