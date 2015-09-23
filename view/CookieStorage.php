@@ -1,22 +1,24 @@
 <?php
 
 class CookieStorage {
-	public function save($name, $string) {
-		// Parametrar(Kakans namn, kakans värde, hur länge ska den leva i sekunder -1 = så länge som möjligt.)
+	/**
+	 * Saves cookie.
+	 * @param  string $name, Name of cookie.
+	 * @param  string $string, Value to be stored.
+	 */
+	public function save($name, $string) {		
 		setcookie($name, $string, -1);
-
-		// var_dump(isset($_COOKIE[$name]) ? $_COOKIE[$name] : "");
-		// die();
-
 	}
 
+	/**
+	 * Loads and removes cookie.
+	 * @param  string $name, Name of cookie.
+	 * @return string, Cookie-value
+	 */
 	public function load($name) {
-		// Om det finns annars tom sträng. Istället för att skriva if- else.
 		$ret = isset($_COOKIE[$name]) ? $_COOKIE[$name] : "";
 
-
-
-		// Tar bort kakan. 
+		// Removes cookie.
 		setcookie($name, "", time() - 1);
 
 

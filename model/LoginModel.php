@@ -17,6 +17,7 @@ class LoginModel {
 	private static $userClientSession = "LoginModel::UserClientSession";
 	// private static $sessionMessage = "LoginModel::SessionMessage";
 	private static $folder = "data/";
+	//private $messageView;
 	// public $rememberMe = false;
 	 
 	// private $isLoggedIn;
@@ -28,17 +29,17 @@ class LoginModel {
 		$this->loginView = $loginView;
 		$this->correctUserName = "Admin";
 		$this->correctPassword = "Password";
-		// $this->cookies = new CookieStorage();
 	}
 
-	// private function setCorrectUserName() {
-	// 	$this->correctUserName = "admin";
+	// private function setCorrectPassword($newPassword) {
+	// 	$this->correctPassword = $newPassword;
 	// }
 
-	private function setCorrectPassword($newPassword) {
-		$this->correctPassword = $newPassword;
-	}
-
+	/**
+	 * Checks if user session exists.
+	 * @param  string $client, Information on users browser.
+	 * @return boolean, True if session is set.
+	 */
 	public function sessionIsSet($client) {
 
 		if(isset($_SESSION[self::$userSession]) && $_SESSION[self::$userClientSession] === $client)
@@ -47,16 +48,22 @@ class LoginModel {
 			return false;
 	}
 
+	/**
+	 * Authorizes users credentials.
+	 * @param  string $userName
+	 * @param  string $password 
+	 * @return boolean, True if input matches correct credentials.
+	 */
 	public function authorize($userName, $password) {
 
 		try {
 			if($userName == "") {
-				throw new Exception("Username is missing");			
+				throw new Exception(MessageView::$userNameMissing);			
 			} elseif ($password == "") {
 				$this->loginView->nameFieldValue = $userName;
-				throw new Exception("Password is missing");				
+				throw new Exception(MessageView::$passWordMissing);				
 			} elseif ($userName !== $this->correctUserName || $password !== $this->correctPassword) {
-				throw new Exception("Wrong name or password");
+				throw new Exception(MessageView::$wrongCredentials);
 			}
 
 		return true;
@@ -67,20 +74,27 @@ class LoginModel {
 		}
 	}
 
+	/**
+	 * Sets new user session.
+	 * @param  string $user, Username
+	 * @param  string $client, Users browser
+	 * @return void  
+	 */
 	public function createUserSession($user, $client) {	
-		// Creates new session.
+		// Saves information on browser in session.
 		$_SESSION[self::$userClientSession] = $client;
+		// Saves user in session.
 		$_SESSION[self::$userSession] = $user;
 	}
 
-	// public function displayLoginLogoutMessages() {
-	// 	if(isset($_SESSION[self::$sessionMessage])) {
-	// 		$this->loginView->setMessage($_SESSION[self::$sessionMessage]);
-	// 		unset($_SESSION[self::$sessionMessage]);
-	// 	}
-	// }
-
+	/**
+	 * Checks if user has been remembered in persistent storage.
+	 * @param  string  $user, Username
+	 * @param  string  $password
+	 * @return boolean, True if user is remembered
+	 */
 	public function hasBeenRemembered($user, $password) {
+		
 		if ($user === null) {
 			return false;
 		}
@@ -94,39 +108,18 @@ class LoginModel {
 			return false;
 		}
 
-
-		// var_dump(file_exists($this->getFileName($user)));
 		return file_exists($this->getFileName($user, $password));
-
-		// $lines = @file("data/rememberedUser.txt");
-		
-
-		// if ($lines === false) {
-		// 	return false;
-		// }
-
-		// foreach ($lines as $existingValue) {
-		// 	$existingValue = trim($existingValue);
-		// 	if ($existingValue === $rememberToken) {
-		// 		return true;
-		// 	}
-		// }
-
-		// return false;
 	}
 
+	/**
+	 * Stores information about user as file.
+	 * @param  string $user
+	 * @param  string $password, Random password string.
+	 * @param  string $rememberExpiration, How long the user is to be rememered.
+	 * @return void
+	 */
 	public function rememberUser($user, $password, $rememberExpiration) {
-		// var_dump($user);
-
-		// if ($this->hasBeenRemembered($user)) {
-		// 	return;
-		// }
-
-		//file_put_contents("data/rememberedUser.txt", "");
-
-		// $fp = fopen("data/rememberedUser.txt", 'a');
-		// fwrite($fp, $user . "\n");
-		// 
+		// Creates file.
 		file_put_contents($this->getFileName($user, $password), "");
 
 		// Saving how long user will be remembered in file. 
@@ -134,15 +127,21 @@ class LoginModel {
 		fwrite($fp, $rememberExpiration . "\n");
 	}
 
+	/**
+	 * Gets filename
+	 * @param  string $user     
+	 * @param  string $password 
+	 * @return string, File-path
+	 */
 	public function getFileName($user, $password) {
 		return self::$folder . $user . '_' . $password;
 	}
 
-	public function forgetUser($user, $password) {
-		// $fp = fopen("data/rememberedUser.txt", 'r+');
-		// @ftruncate($fp, 0);
-		//unlink($this->getFileName($user, $password));
-
+	/**
+	 * Removes all files in data-folder.
+	 * @return void
+	 */
+	public function forgetUser() {
 		// http://stackoverflow.com/questions/4594180/deleting-all-files-from-a-folder-using-php
 		$files = glob(self::$folder . '*');
 		foreach ($files as $file) {
@@ -152,15 +151,19 @@ class LoginModel {
 		}
 	}
 
+	/**
+	 * Removes user session
+	 * @return void
+	 */
 	public function removeUserSession() {
 		unset($_SESSION[self::$userSession]);
-		// session_destroy();
-		// Reloads page.
-	
-		// // Sets bye bye cookie.	
-		// $this->loginView->setCookieMessage("Bye bye!");
-		// //$_SESSION[self::$sessionMessage] = "Bye bye!";
-		// header('Location: '.$_SERVER['REQUEST_URI']);
-		// exit();	
+	}
+
+	/**
+	 * Creates random string that is used as temporary password.
+	 * @return string, Random string.
+	 */
+	public function getRandomStringPassword() {
+		return sha1(rand());
 	}
 }

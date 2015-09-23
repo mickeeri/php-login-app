@@ -6,6 +6,7 @@ require_once('view/DateTimeView.php');
 require_once('view/LayoutView.php');
 require_once('controller/LoginController.php');
 require_once('model/LoginModel.php');
+require_once('view/Messages.php');
 
 // MAKE SURE ERRORS ARE SHOWN... MIGHT WANT TO TURN THIS OFF ON A PUBLIC SERVER
 error_reporting(E_ALL);
@@ -22,3 +23,7 @@ $isLoggedIn = $loginController->isLoggedIn();
 
 // Render layout and login-form. 
 $layoutView->render($isLoggedIn, $loginView, $dateTimeView);
+
+//TODO:
+// Create random string in model.
+// Change handeling of messages.

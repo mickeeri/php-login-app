@@ -13,42 +13,27 @@ class LoginView {
 	private static $messageId = 'LoginView::Message';
 	private static $cookieMessage = 'LoginView::CookieMessage';
 	private static $message; 
-	// public $message;
+	// Username-field value.
 	public $nameFieldValue;
 
 	public function __construct() {	
 		$this->cookieStorage = new CookieStorage();
-	}
+	}	
 
 	/**
-	 * Create HTTP response
-	 *
-	 * Should be called after a login attempt has been determined.
-	 *
-	 * @return  void BUT writes to standard output and cookies!
+	 * Creates HTTP response. 
+	 * @param  function $isLoggedIn function in LoginController. True if user is logged in.
+	 * @return void BUT writes to standard output and cookies!
 	 */
-	public function response($isLoggedIn) {
-		//var_dump(isset($_COOKIE[self::$cookieName]));
-		
-		// if(isset($_COOKIE[self::$cookieName])) {
-		// 	$userName = $_COOKIE[self::$cookieName];
-		// 	$password = $_COOKIE[self::$cookiePassword];
+	public function response(LoginController $isLoggedIn) {
 
-		// 	$this->destroyCookies();
-
-		// 	$this->setCookies($userName, $password);
-		// }
-
-		$message = self::$message;
-		//$message = "";		
+		$message = self::$message;	
 
 		// See if there is welcome- or bye-bye-message stored as cookie.
 		if($this->cookieStorage->load(self::$cookieMessage) !== "") {
 			$message = $this->cookieStorage->load(self::$cookieMessage);
 		}
 		
-		//$message = self::$message;
-
 		if($isLoggedIn) {
 			$response = $this->generateLogoutButtonHTML($message);
 		} else {
@@ -58,6 +43,10 @@ class LoginView {
 		return $response;
 	}
 
+	/**
+	 * Checks if user has pressed login-button.
+	 * @return boolean
+	 */
 	public function didUserPressLoginButton() {
 		// If user has pressed submit button launch method response.
 		if (isset($_POST[self::$login]))
@@ -65,34 +54,50 @@ class LoginView {
 		return false;
 	}
 
+	/**
+	 * Checks if user has pressed logout-button.
+	 * @return boolean
+	 */
 	public function didUserPressLogoutButton() {
 		if (isset($_POST[self::$logout]))		
 			return true;
 		return false;	
 	}
 
+	/**
+	 * Is "Keep me logged in"-checkbox checked.
+	 * @return boolean
+	 */
 	public function isKeepMeLoggedInChecked() {
 		return isset($_POST[self::$keep]);
 	}
 
+	/**
+	 * @return string Username stored in cookie.
+	 */
 	public function getUserNameCookie() {
 		return isset($_COOKIE[self::$cookieName]) ? $_COOKIE[self::$cookieName] : NULL;
 	}
 
+	/**
+	 * @return string Password from cookie.
+	 */
 	public function getPasswordCookie() {
-		$ret = isset($_COOKIE[self::$cookiePassword]) ? $_COOKIE[self::$cookiePassword] : NULL;
-		//setcookie(self::$cookiePassword, $this->generateRandomString(), strtotime( '+30 days' ));
-		return $ret;
+		return isset($_COOKIE[self::$cookiePassword]) ? $_COOKIE[self::$cookiePassword] : NULL;
 	}
 
+	/**
+	 * Removes cookies
+	 * @return void
+	 */
 	public function destroyCookies() {
 		setcookie(self::$cookieName, "", time() - 1);
 		setcookie(self::$cookiePassword, "", time() - 1);
 	}
 
-	public function getMessage($message) {
-		return $message;
-	}
+	// public function getMessage($message) {
+	// 	return $message;
+	// }
 
 	/**
 	* Generate HTML code on the output buffer for the logout button
@@ -137,27 +142,42 @@ class LoginView {
 		return $ret;
 	}
 	
-	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
+	/**
+	 * Gets Username after user input.
+	 * @return string
+	 */
 	public function getRequestUserName() {
 		return isset($_POST[self::$name]) ? $_POST[self::$name] : "";
 	}
 
+	/**
+	 * Gets Password after input.
+	 * @return string
+	 */
 	public function getRequestPassword() {
 		return isset($_POST[self::$password]) ? $_POST[self::$password] : "";
 	}
 
+	/**
+	 * Sets a feedback-message as cookie to be displayed after reload.
+	 * @param string $message
+	 */
 	public function setCookieMessage($message) {
-		//$this->cookieStorage->save(self::$cookieMessage, $message);
 		setcookie(self::$cookieMessage, $message, -1);
 	}
 
-	public function setMessage($message) {
-		self::$message = $message;
-	}
+	// public function setMessage($message) {
+	// 	self::$message = $message;
+	// }
 
+	
+	/**
+	 * Creates Username and Password cookie if user wants to be remembered.
+	 * @param string $userName        
+	 * @param string $password     
+	 * @param string $cookieExpirationTime, How long the the cookies are going to exist.
+	 */
 	public function setCookies($userName, $password, $cookieExpirationTime){
-		// setcookie(self::$cookieName, $userName, strtotime( '+30 days' ));
-		// setcookie(self::$cookiePassword, $password, strtotime( '+30 days' ));
 		setcookie(self::$cookieName, $userName, $cookieExpirationTime);
 		setcookie(self::$cookiePassword, $password, $cookieExpirationTime);
 	}
@@ -166,36 +186,34 @@ class LoginView {
 	// 	return $this->getRequestUserName();
 	// }
 
-	// From stackoverflow.
-	private function generateRandomString($length = 30) {
-	    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	    $charactersLength = strlen($characters);
-	    $randomString = '';
-	    for ($i = 0; $i < $length; $i++) {
-	        $randomString .= $characters[rand(0, $charactersLength - 1)];
-	    }
-	    return $randomString;
-	}
+	// // From stackoverflow.
+	// private function generateRandomString($length = 30) {
+	//     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	//     $charactersLength = strlen($characters);
+	//     $randomString = '';
+	//     for ($i = 0; $i < $length; $i++) {
+	//         $randomString .= $characters[rand(0, $charactersLength - 1)];
+	//     }
+	//     return $randomString;
+	// }
 
-	public function reloadPage($messageType) {
-		// TODO: Meddelandetyper i variabler. Egen klass?
-		if($messageType === "logout") {
-			$this->setCookieMessage("Bye bye!");
-		} elseif ($messageType === "regular-login") {
-			$this->setCookieMessage("Welcome");
-		} elseif ($messageType === "login-cookie") {
-			$this->setCookieMessage("Welcome and you will be remembered");
-		} elseif($messageType === "welcome-back-login") {
-			$this->setCookieMessage("Welcome back with cookie");
-		} elseif ($messageType === "manipulated-cookie") {
-			//setcookie(self::$cookiePassword, "", time() - 1);
-			$this->setCookieMessage("Wrong information in cookies");
-		}
+	/**
+	 * Saves message in cookie and then reloads page.
+	 * @param  string $message, To be stored in cookie and displayed after reload.
+	 * @return void
+	 */
+	public function reloadPage($message) {
 
+		$this->setCookieMessage($message);
 		header('Location: '.$_SERVER['REQUEST_URI']);
 		exit();	
 	}
 
+	
+	/**
+	 * Provides informatino on users browser. 
+	 * @return string, User agent
+	 */
 	public function getClientIdentifier() {
 		return $_SERVER["HTTP_USER_AGENT"];
 	}
