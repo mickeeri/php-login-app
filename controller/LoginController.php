@@ -58,7 +58,7 @@ class LoginController {
 					
 					// If credentials are correct create cookies and remeber user in persistent storage.
 					if ($loginModel->authorize($userName, $password)) {
-						$cookieExpirationTime = time()+20;
+						$cookieExpirationTime = time()+60;
 						$randomStringPassword = $loginModel->getRandomStringPassword();						
 						$this->loginView->setCookies($userName, $randomStringPassword, $cookieExpirationTime);
 						$loginModel->rememberUser($userName, $randomStringPassword, $cookieExpirationTime);

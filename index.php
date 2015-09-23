@@ -18,12 +18,8 @@ $loginController = new loginController($loginView);
 $dateTimeView = new DateTimeView();
 $layoutView = new LayoutView();
 
-// Returns true if user has session.
+// Returns true if user has session or is stored in file.
 $isLoggedIn = $loginController->isLoggedIn();
 
 // Render layout and login-form. 
 $layoutView->render($isLoggedIn, $loginView, $dateTimeView);
-
-//TODO:
-// Create random string in model.
-// Change handeling of messages.

@@ -25,7 +25,7 @@ class LoginView {
 	 * @param  function $isLoggedIn function in LoginController. True if user is logged in.
 	 * @return void BUT writes to standard output and cookies!
 	 */
-	public function response(LoginController $isLoggedIn) {
+	public function response($isLoggedIn) {
 
 		$message = self::$message;	
 
@@ -166,10 +166,13 @@ class LoginView {
 		setcookie(self::$cookieMessage, $message, -1);
 	}
 
-	// public function setMessage($message) {
-	// 	self::$message = $message;
-	// }
-
+	/**
+	 * Sets message.
+	 * @param string $message
+	 */
+	public function setMessage($message) {
+		self::$message = $message;
+	}
 	
 	/**
 	 * Creates Username and Password cookie if user wants to be remembered.
