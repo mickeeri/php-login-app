@@ -185,21 +185,6 @@ class LoginView {
 		setcookie(self::$cookiePassword, $password, $cookieExpirationTime);
 	}
 
-	// public function getClientIdentifier() {
-	// 	return $this->getRequestUserName();
-	// }
-
-	// // From stackoverflow.
-	// private function generateRandomString($length = 30) {
-	//     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	//     $charactersLength = strlen($characters);
-	//     $randomString = '';
-	//     for ($i = 0; $i < $length; $i++) {
-	//         $randomString .= $characters[rand(0, $charactersLength - 1)];
-	//     }
-	//     return $randomString;
-	// }
-
 	/**
 	 * Saves message in cookie and then reloads page.
 	 * @param  string $message, To be stored in cookie and displayed after reload.
