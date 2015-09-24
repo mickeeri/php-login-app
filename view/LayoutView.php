@@ -3,6 +3,12 @@
 
 class LayoutView {
   
+  /**
+   * Renders HTML
+   * @param  boolean $isLoggedIn, Method from controller.
+   * @param  LoginView $v, Sign up form
+   * @param  DateTimeView $dtv       
+   */
   public function render($isLoggedIn, LoginView $v, DateTimeView $dtv) {
     echo '<!DOCTYPE html>
       <html>
@@ -24,6 +30,10 @@ class LayoutView {
     ';
   }
   
+  /**
+   * Renders h2 based on logged in or not.
+   * @param  boolean $isLoggedIn
+   */
   private function renderIsLoggedIn($isLoggedIn) {
     if ($isLoggedIn) {
       return '<h2>Logged in</h2>';

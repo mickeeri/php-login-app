@@ -4,36 +4,19 @@
 
 session_start();
 
-// require_once('view/CookieStorage.php');
-
-/**
-* 
-*/
 class LoginModel {
 
 	private $correctUserName;
 	private $correctPassword;
 	private static $userSession = "LoginModel::UserSession";
 	private static $userClientSession = "LoginModel::UserClientSession";
-	// private static $sessionMessage = "LoginModel::SessionMessage";
 	private static $folder = "data/";
-	//private $messageView;
-	// public $rememberMe = false;
-	 
-	// private $isLoggedIn;
-	
-	/**
-	 * [__construct description]
-	 */
+
 	public function __construct(LoginView $loginView) {
 		$this->loginView = $loginView;
 		$this->correctUserName = "Admin";
 		$this->correctPassword = "Password";
 	}
-
-	// private function setCorrectPassword($newPassword) {
-	// 	$this->correctPassword = $newPassword;
-	// }
 
 	/**
 	 * Checks if user session exists.
