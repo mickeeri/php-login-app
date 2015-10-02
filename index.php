@@ -9,8 +9,13 @@ require_once('model/LoginModel.php');
 require_once('view/Messages.php');
 
 // // MAKE SURE ERRORS ARE SHOWN... MIGHT WANT TO TURN THIS OFF ON A PUBLIC SERVER
-// error_reporting(E_ALL);
-// ini_set('display_errors', 'On');
+if (Settings::DISPLAY_ERRORS) {
+	error_reporting(-1);
+	ini_set('display_errors', 'ON');
+}
+
+// Start session before creating model
+session_start();
 
 // Creating objects of views and controller. 
 $loginView = new LoginView();

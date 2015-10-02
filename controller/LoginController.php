@@ -1,5 +1,7 @@
 <?php
 
+namespace controller;
+
 class LoginController {
 	private $loginModel;
 	private $layoutView;

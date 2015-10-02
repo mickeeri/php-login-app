@@ -1,5 +1,7 @@
 <?php
  
+namespace view;
+
 /**
  * Messages to be displayed as feedback.
  */

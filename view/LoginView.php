@@ -2,6 +2,8 @@
 
 require_once('CookieStorage.php');
 
+namespace view;
+
 class LoginView {
 	private static $login = 'LoginView::Login';
 	private static $logout = 'LoginView::Logout';
