@@ -14,7 +14,7 @@ class UserView
 
 	
 
-	function __construct()
+	publi function __construct(model, navigationview)
 	{
 		# code...
 	}
@@ -43,11 +43,11 @@ class UserView
 		} catch (\model\NoUserIdException $e) {
 			this->message = "No user id set.";
 		} catch (\model\NoUserNameException $e) {
-			this->message = "Username has to be entered.";
+			this->message = "You have to enter name";
 		} catch (\model\NoPasswordException $e) {
-			this->message = "Password has to be entered.";
+			this->message = "Password can't be blank.";
 		} catch (\model\NoPasswordConfirmationException $e) {
-			this->message = "Passwrod confirmation has to entered.";
+			this->message = "Password confirmation can't be blank.";
 		} catch (Exception $e) {
 			this->message = "Something went wrong. Try again!";
 		}
@@ -79,6 +79,10 @@ class UserView
 			return trim($_POST[$field]);
 		}
 		return  "";
+	}
+
+	public function setMessage($message){
+		$this->message = $message;
 	}
 
 	/**
