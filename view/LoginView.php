@@ -1,8 +1,8 @@
 <?php
 
-require_once('CookieStorage.php');
-
 namespace view;
+
+require_once('CookieStorage.php');
 
 class LoginView {
 	private static $login = 'LoginView::Login';

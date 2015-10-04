@@ -10,8 +10,8 @@ class LoginModel {
 	private static $userClientSession = "LoginModel::UserClientSession";
 	private static $folder = "data/";
 
-	public function __construct(LoginView $loginView) {
-		$this->loginView = $loginView;
+	public function __construct() {
+		//$this->loginView = $loginView;
 		$this->correctUserName = "Admin";
 		$this->correctPassword = "Password";
 	}
@@ -39,18 +39,19 @@ class LoginModel {
 
 		try {
 			if($userName == "") {
-				throw new Exception(MessageView::$userNameMissing);			
+				throw new \Exception(\view\MessageView::$userNameMissing);			
 			} elseif ($password == "") {
-				$this->loginView->nameFieldValue = $userName;
-				throw new Exception(MessageView::$passWordMissing);				
+				//$this->loginView->nameFieldValue = $userName;
+				throw new \Exception(\view\MessageView::$passWordMissing);				
 			} elseif ($userName !== $this->correctUserName || $password !== $this->correctPassword) {
-				throw new Exception(MessageView::$wrongCredentials);
+				throw new \Exception(\view\MessageView::$wrongCredentials);
 			}
 
 		return true;
 			
-		} catch (Exception $e) {
-			$this->loginView->setMessage($e->getMessage()); 
+		} catch (\Exception $e) {
+			// TODO find other way to display message. Kasta egna exceptions t.ex. NoUsernameException.
+			//$this->loginView->setMessage($e->getMessage()); 
 			return false;
 		}
 	}

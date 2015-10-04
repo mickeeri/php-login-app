@@ -7,16 +7,19 @@ namespace view;
 */
 class UserView
 {
-	private static $submitPostID = "Register";
+	/// https://github.com/dntoll/1DV608/blob/master/lectures/LectureCode/view/AdminView.php
+
+	private static $submitPostID = "register";
 	private static $userNamePostID = "name";
 	private static $passwordPostID = "password";
 	private static $passwordConfirmationPostID = "passwordConfirmation";
 
 	
 
-	publi function __construct(model, navigationview)
+	public function __construct(\model\UserFacade $m, \view\NavigationView $navigationView)
 	{
-		# code...
+		$this->userFacade = $m;
+		$this->navigationView = $navigationView;
 	}
 
 	/**
@@ -41,15 +44,15 @@ class UserView
 		try {
 			return new \model\User($userID, $userName, $password);
 		} catch (\model\NoUserIdException $e) {
-			this->message = "No user id set.";
+			$this->message = "No user id set.";
 		} catch (\model\NoUserNameException $e) {
-			this->message = "You have to enter name";
+			$this->message = "You have to enter name";
 		} catch (\model\NoPasswordException $e) {
-			this->message = "Password can't be blank.";
+			$this->message = "Password can't be blank.";
 		} catch (\model\NoPasswordConfirmationException $e) {
-			this->message = "Password confirmation can't be blank.";
+			$this->message = "Password confirmation can't be blank.";
 		} catch (Exception $e) {
-			this->message = "Something went wrong. Try again!";
+			$this->message = "Something went wrong. Try again!";
 		}
 		return null;
 	}
@@ -66,7 +69,7 @@ class UserView
 			$this->getTextField("Password: ", self::$passwordPostID) . "</br>" .
 			$this->getTextField("Repeat password: ", self::$pricePostID) . "</br>" .
 		"<input type='submit' name='".self::$submitPostID."'>
-		</form>" //. $this->catalog->getHTML();
+		</form>"; //. $this->catalog->getHTML();
 	}
 
 	/**

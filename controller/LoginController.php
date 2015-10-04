@@ -2,13 +2,18 @@
 
 namespace controller;
 
-class LoginController {
-	private $loginModel;
-	private $layoutView;
+// require_once("model/LoginModel.php");
+// require_once("view/LoginView.php");
+require_once("view/NavigationView.php");
 
-	public function __construct(LoginView $loginView) {				
+class LoginController {
+	//private $loginModel;
+	private $navigationView;
+
+	public function __construct(\model\LoginModel $loginModel, \view\LoginView $loginView) {				
+		$this->loginModel = $loginModel;
 		$this->loginView = $loginView;
-		$this->loginModel = new LoginModel($this->loginView);		
+		$this->navigationView = new \view\NavigationView();
 	}
 
 	
@@ -27,7 +32,7 @@ class LoginController {
 
 			// User wants to log out.
 			if($this->loginView->didUserPressLogoutButton()) {
-				return $this->logout(MessageView::$regularLogout);
+				return $this->logout(\view\MessageView::$regularLogout);
 			}
 
 			return true;
@@ -37,14 +42,14 @@ class LoginController {
 			
 			// Creates new user session.
 			$this->loginModel->createUserSession($this->loginView->getUserNameCookie(), $client);
-			$loginView->reloadPage(MessageView::$welcomeBack);
+			$loginView->reloadPage(\view\MessageView::$welcomeBack);
 
 			//return true;
 		}
 		// Cookies exists but don't pass the hasBeenRemembered method and therefore are manipulated.
 		elseif ($loginView->getUserNameCookie() !== null && $loginView->getPasswordCookie() !== null) {
 			
-			$this->logout(MessageView::$manipulatedCookie);			
+			$this->logout(\view\MessageView::$manipulatedCookie);			
 		}
 		// User is not logged in and not remembered in persistent storage.
 		else {
@@ -64,12 +69,12 @@ class LoginController {
 						$randomStringPassword = $loginModel->getRandomStringPassword();						
 						$this->loginView->setCookies($userName, $randomStringPassword, $cookieExpirationTime);
 						$loginModel->rememberUser($userName, $randomStringPassword, $cookieExpirationTime);
-						return $this->login($userName, $password, $client, MessageView::$loginCookie);
+						return $this->login($userName, $password, $client, \view\MessageView::$loginCookie);
 					}									
 				} 
 				// Regular login without "Keep me logged in" checked.
 				else {
-					return $this->login($userName, $password, $client, MessageView::$regularLogin);
+					return $this->login($userName, $password, $client, \view\MessageView::$regularLogin);
 				}
 			}
 			return false;
@@ -108,5 +113,9 @@ class LoginController {
 		$this->loginView->reloadPage($message);
 
 		return false;
+	}
+
+	public function getView() {
+		return $this->loginView;
 	}
 }

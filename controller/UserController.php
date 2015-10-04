@@ -10,9 +10,10 @@ class UserController
 	
 	// https://github.com/dntoll/1DV608/blob/master/lectures/LectureCode/controller/AdminController.php
 
-	function __construct(adminmodel/servicemoedl, userview)
+	function __construct(\model\UserFacade $m, \view\UserView $v)
 	{
-		# code...
+		$this->model = $m;
+		$this->view = $v;
 	}
 
 	/**
