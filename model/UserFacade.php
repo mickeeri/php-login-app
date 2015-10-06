@@ -28,6 +28,6 @@ class UserFacade
 	 * @return [type] [description]
 	 */
 	public function getUsers(){
-		return $this->dal-getUsers();
+		return $this->dal->getUsers();
 	}
 }

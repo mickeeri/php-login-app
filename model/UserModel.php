@@ -17,7 +17,7 @@ class User {
 	private $passwordConfirmation;
 	
 	function __construct($userName, $password, $passwordConfirmation) {
-		$this->userID = 0;
+		//$this->userID = 0;
 		$this->userName = $userName;
 		$this->password = $password;
 		$this->passwordConfirmation = $passwordConfirmation;
