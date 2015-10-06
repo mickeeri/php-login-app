@@ -6,6 +6,7 @@ namespace controller;
 require_once("model/LoginModel.php");
 require_once("model/UserFacade.php");
 require_once("model/UserDAL.php");
+require_once("model/UserModel.php");
 
 // Views
 require_once("view/UserView.php");
@@ -21,9 +22,11 @@ require_once('controller/LoginController.php');
 */
 class AppController {
 	
+	private $navigationView;
+
 	function __construct() {
 		$this->mysqli = new \mysqli("localhost", "root", "", "phpassignment");
-		if(mysqli_connect_error()) {
+		if(mysqli_connect_errno()) {
 			printf("Connect failed: %s\n", mysqli_connect_error());
 			exit();
 		}

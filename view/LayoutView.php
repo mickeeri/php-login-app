@@ -2,15 +2,16 @@
 
 namespace view;
 
-class LayoutView {
-  
+
+
+class LayoutView {  
   /**
    * Renders HTML
    * @param  boolean $isLoggedIn, Method from controller.
    * @param  LoginView $v, Sign up form
    * @param  DateTimeView $dtv       
    */
-  public function render($isLoggedIn, LoginView $v, DateTimeView $dtv) {
+  public function render($isLoggedIn, $v, DateTimeView $dtv, NavigationView $nv) {
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -18,11 +19,12 @@ class LayoutView {
           <title>Login Example</title>
         </head>
         <body>
-          <h1>Assignment 2</h1>
+          <h1>Assignment 4</h1>
+          ' . $this->renderNavigation($nv) . ' 
           ' . $this->renderIsLoggedIn($isLoggedIn) . '
           
           <div class="container">
-              ' . $v->response($isLoggedIn) . '
+              ' . $v->response() . '
               
               ' . $dtv->show() . '
           </div>
@@ -40,10 +42,15 @@ class LayoutView {
       return '<h2>Logged in</h2>';
     }
     else {
-      return '
-      <a href="?register">Register a new user<a/>
-      <h2>Not logged in</h2>
-      ';
+      return '<h2>Not logged in</h2>';
     }
   }
+
+    private function renderNavigation($nv) {
+        if($nv->onLoginPage()){
+            return $nv->getLinkToRegisterNewUser();
+        } else {
+            return $nv->getLinkToLogin();
+        }
+    }
 }

@@ -9,6 +9,7 @@
 // require_once('view/Messages.php');
 
 require_once('view/Messages.php');
+require_once("view/NavigationView.php");
 
 require_once('view/LayoutView.php');
 require_once('view/DateTimeView.php');
@@ -41,12 +42,14 @@ $view = $ac->generateOutput();
 
 $dtv = new \view\DateTimeView();
 $lv = new \view\LayoutView();
+$nv = new \view\NavigationView();
 
 // Returns true if user has session or is stored in file.
 //$isLoggedIn = $c->isLoggedIn();
+//
 
 // Render layout and login-form. 
-$lv->render(false, $view, $dtv);
+$lv->render(false, $view, $dtv, $nv);
 
 
 //$lv->render($m->isLoggedIn($v->getUserClient()), $v, $dtv);

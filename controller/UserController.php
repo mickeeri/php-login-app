@@ -20,12 +20,16 @@ class UserController
 	 * Gets user from view new user form and passes to model. 
 	 */
 	public function addUser(){
-		$user = $this->view->getUser();
-		if ($user != null) {
-			try {
-				$this->model->add($user);
-			} catch (\Exception $e) {
-				$this->view->setMessage($e->getMessage());	// Or other error.			
+		// If user has pressed submit-button.
+		if($this->view->userWantToRegister()) {
+			$user = $this->view->getUser();
+			if ($user != null) {
+				try {
+					$this->model->add($user);
+				} catch (\Exception $e) {
+					//$this->view->setDuplicate();
+					$this->view->setMessage($e->getMessage());	// Or other error.			
+				}
 			}
 		}
 	}

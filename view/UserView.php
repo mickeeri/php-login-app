@@ -2,6 +2,8 @@
 
 namespace view;
 
+
+
 /**
 * 
 */
@@ -13,6 +15,8 @@ class UserView
 	private static $userNamePostID = "name";
 	private static $passwordPostID = "password";
 	private static $passwordConfirmationPostID = "passwordConfirmation";
+
+	public $message = "";
 
 	
 
@@ -28,6 +32,10 @@ class UserView
 	 */
 	public function userWantToRegister() {
 		return isset($_POST[self::$submitPostID]);
+	}
+
+	public function response() {
+		return $this->getHTML();
 	}
 
 	/**
@@ -65,9 +73,9 @@ class UserView
 		return "
 		<p>$this->message</p>
 		<form method='post'>" . 
-			$this->getTextField("Name: ", self::$userNamePostID) . "</br>" .
-			$this->getTextField("Password: ", self::$passwordPostID) . "</br>" .
-			$this->getTextField("Repeat password: ", self::$pricePostID) . "</br>" .
+			$this->getTextField("Name", self::$userNamePostID) . "</br>" .
+			$this->getTextField("Password", self::$passwordPostID) . "</br>" .
+			$this->getTextField("Repeat password", self::$passwordConfirmationPostID) . "</br>" .
 		"<input type='submit' name='".self::$submitPostID."'>
 		</form>"; //. $this->catalog->getHTML();
 	}

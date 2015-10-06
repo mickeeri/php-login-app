@@ -27,7 +27,7 @@ class LoginView {
 	 * @param  function $isLoggedIn function in LoginController. True if user is logged in.
 	 * @return void BUT writes to standard output and cookies!
 	 */
-	public function response($isLoggedIn) {
+	public function response() {
 
 		$message = self::$message;	
 
@@ -36,7 +36,8 @@ class LoginView {
 			$message = $this->cookieStorage->load(self::$cookieMessage);
 		}
 		
-		if($isLoggedIn) {
+		// isloggedin. fråga modellen. 
+		if(false) {
 			$response = $this->generateLogoutButtonHTML($message);
 		} else {
 			$response = $this->generateLoginFormHTML($message);
