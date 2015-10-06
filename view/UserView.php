@@ -20,10 +20,10 @@ class UserView
 
 	private static $registrationHasSucceeded = false;
 	
-	public function __construct(\model\UserFacade $m, \view\NavigationView $navigationView)
+	public function __construct(\model\UserFacade $m, \view\AppView $appView)
 	{
 		$this->userFacade = $m;
-		$this->navigationView = $navigationView;
+		$this->appView = $appView;
 	}
 
 	/**
@@ -36,7 +36,7 @@ class UserView
 
 	public function response() {
 		if(self::$registrationHasSucceeded) {
-			$this->navigationView->redirect("Registerd new user.");
+			$this->appView->redirect("Registerd new user.");
 		}
 		return $this->getHTML();
 	}

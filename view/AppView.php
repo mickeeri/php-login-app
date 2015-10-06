@@ -3,9 +3,9 @@
 namespace view;
 
 /**
-* 
+* Collects functionality that both login and user views has in common. 
 */
-class NavigationView {
+class AppView {
 	
 	/**
 	 * [$loginURLID description]
@@ -13,7 +13,8 @@ class NavigationView {
 	 */
 	//private static $loginURLID = "login";
 	private static $newUserURL = "register";
-	private static $sessionSaveLocation = "\\view\\NavigationView\\message";
+	private static $sessionSaveLocation = "\\view\\AppView\\message";
+	private static $messageCookieName = "AppView::Message";
 
 
 	/**
@@ -46,9 +47,30 @@ class NavigationView {
 		return "";
 	}
 
+	public function getCookieMessage() {
+		$ret = isset($_COOKIE[self::$messageCookieName]) ? $_COOKIE[self::$messageCookieName] : "";
+		setcookie(self::$messageCookieName, "", time() - 1);
+		return $ret;
+	}
+
+	/**
+	 * Saves message and redirects user to index page.
+	 * @param  string $message feedback to user
+	 */
 	public function redirect($message) {
-		$_SESSION[self::$sessionSaveLocation] = $message;
+		//$_SESSION[self::$sessionSaveLocation] = $message;
+		setcookie(self::$messageCookieName, $message, -1);
 		$actual_link = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
 		header("Location: $actual_link");
+		// header('Location: '.$_SERVER['REQUEST_URI']);
+		exit();
+	}
+
+	/**
+	 * Provides information on users browser to avoid session hijacking.
+	 * @return string info on user browser
+	 */
+	public function getClientIdentifier() {
+		return $_SERVER["HTTP_USER_AGENT"];
 	}
 }

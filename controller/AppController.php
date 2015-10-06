@@ -3,14 +3,14 @@
 namespace controller;
 
 // Models
-require_once("model/LoginModel.php");
+//require_once("model/LoginModel.php");
 require_once("model/UserFacade.php");
 require_once("model/UserDAL.php");
 require_once("model/UserModel.php");
 
 // Views
 require_once("view/UserView.php");
-require_once("view/NavigationView.php");
+//require_once("view/NavigationView.php");
 require_once("view/LoginView.php");
 
 // Controllers
@@ -22,33 +22,40 @@ require_once('controller/LoginController.php');
 */
 class AppController {
 	
-	private $navigationView;
+	// private $appView;
+	// private $loginModel;
+	//public static $isLoggedIn = false;
 
-	function __construct() {
+	/**
+	 * Created in index.php
+	 * @param \model\LoginModel $loginModel 
+	 * @param \view\AppView     $appView  
+	 */
+	function __construct(\model\LoginModel $loginModel, \view\AppView $appView) {
 		$this->mysqli = new \mysqli("localhost", "root", "", "phpassignment");
 		if(mysqli_connect_errno()) {
 			printf("Connect failed: %s\n", mysqli_connect_error());
 			exit();
 		}
 
+		$this->loginModel = $loginModel;
 		$this->userDAL = new \model\UserDAL($this->mysqli);
-		$this->navigationView = new \view\NavigationView();
+		$this->appView = $appView;
 	}
 
 	public function handleInput() {
-		if ($this->navigationView->onLoginPage()) {
-			$model = new \model\LoginModel();
-			$view = new \view\LoginView($this->navigationView);
-			$login = new \controller\LoginController($model, $view, $this->navigationView);
+		if ($this->appView->onLoginPage()) {
+			//$model = new \model\LoginModel();
+			$view = new \view\LoginView($this->loginModel, $this->appView);
+			$login = new \controller\LoginController($this->loginModel, $view, $this->appView);
 
 			// Handle input 
-			$login->isLoggedIn();
-
+			$login->doLogin();
 			$this->view = $login->getView();
 		} else {
 			$model = new \model\UserFacade($this->userDAL);
-			$this->view = new \view\UserView($model, $this->navigationView);
-			$uc = new \controller\UserController($model, $this->view, $this->navigationView);
+			$this->view = new \view\UserView($model, $this->appView);
+			$uc = new \controller\UserController($model, $this->view, $this->appView);
 
 			$uc->addUser();
 		}

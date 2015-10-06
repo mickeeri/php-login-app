@@ -5,31 +5,29 @@ namespace controller;
 /**
 * 
 */
-class UserController
-{
+class UserController {
 	
 	// https://github.com/dntoll/1DV608/blob/master/lectures/LectureCode/controller/AdminController.php
 
-	function __construct(\model\UserFacade $m, \view\UserView $v)
-	{
-		$this->model = $m;
-		$this->view = $v;
+	function __construct(\model\UserFacade $userFacade, \view\UserView $userView) {
+		$this->userFacade = $userFacade;
+		$this->userView = $userView;
 	}
 
 	/**
-	 * Gets user from view new user form and passes to model. 
+	 * Gets user from userView new user form and passes to userFacade. 
 	 */
 	public function addUser(){
 		// If user has pressed submit-button.
-		if($this->view->userWantToRegister()) {
-			$user = $this->view->getUser();
+		if($this->userView->userWantToRegister()) {
+			$user = $this->userView->getUser();
 			if ($user != null) {
 				try {
-					$this->model->add($user);
-					$this->view->setRegistrationHasSucceeded();
+					$this->userFacade->add($user);
+					$this->userView->setRegistrationHasSucceeded();
 				} catch (\Exception $e) {
-					//$this->view->setDuplicate();
-					$this->view->setMessage($e->getMessage());	// Or other error.			
+					//$this->userView->setDuplicate();
+					$this->userView->setMessage($e->getMessage());	// Or other error.			
 				}
 			}
 		}
