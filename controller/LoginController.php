@@ -4,16 +4,17 @@ namespace controller;
 
 // require_once("model/LoginModel.php");
 // require_once("view/LoginView.php");
-require_once("view/NavigationView.php");
+//require_once("view/NavigationView.php");
 
 class LoginController {
 	//private $loginModel;
-	private $navigationView;
+	//private $navigationView;
+	private static $isLoggedIn = false;
 
 	public function __construct(\model\LoginModel $loginModel, \view\LoginView $loginView) {				
 		$this->loginModel = $loginModel;
 		$this->loginView = $loginView;
-		$this->navigationView = new \view\NavigationView();
+		//$this->navigationView = $navigationView;
 	}
 
 	
@@ -21,7 +22,7 @@ class LoginController {
 	 * Performs diffrent types of sign in/sign out based on user input. Returns true if user is logged in.
 	 * @return boolean
 	 */
-	public function isLoggedIn(){
+	public function doLogin(){
 		$loginView = $this->loginView;
 		$loginModel = $this->loginModel;
 		// Get information on users client from view.

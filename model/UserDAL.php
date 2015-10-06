@@ -3,13 +3,7 @@
 namespace model;
 
 /**
-* CREATE TABLE IF NOT EXISTS `users` (
-  `pk` int(11) NOT NULL AUTO_INCREMENT,
-  `userName` varchar(255) COLLATE utf8_swedish_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8_swedish_ci NOT NULL,
-  PRIMARY KEY (`pk`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_swedish_ci AUTO_INCREMENT=1 ;
-
+*
 */
 class UserDAL
 {

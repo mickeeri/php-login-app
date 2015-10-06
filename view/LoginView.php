@@ -18,7 +18,8 @@ class LoginView {
 	// Username-field value.
 	public $nameFieldValue;
 
-	public function __construct() {	
+	public function __construct(\view\NavigationView $navigationView) {	
+		$this->navigationView = $navigationView;
 		$this->cookieStorage = new CookieStorage();
 	}	
 
@@ -29,12 +30,16 @@ class LoginView {
 	 */
 	public function response() {
 
-		$message = self::$message;	
+		//$message = self::$message;	
 
 		// See if there is welcome- or bye-bye-message stored as cookie.
 		if($this->cookieStorage->load(self::$cookieMessage) !== "") {
 			$message = $this->cookieStorage->load(self::$cookieMessage);
+		} else {
+			$message = $this->navigationView->getSessionMessage();
 		}
+		
+		
 		
 		// isloggedin. fråga modellen. 
 		if(false) {
@@ -194,7 +199,7 @@ class LoginView {
 	 * @return void
 	 */
 	public function reloadPage($message) {
-
+		// Now does this in navigationView;
 		$this->setCookieMessage($message);
 		header('Location: '.$_SERVER['REQUEST_URI']);
 		exit();	

@@ -38,8 +38,8 @@ class AppController {
 	public function handleInput() {
 		if ($this->navigationView->onLoginPage()) {
 			$model = new \model\LoginModel();
-			$view = new \view\LoginView();
-			$login = new \controller\LoginController($model, $view);
+			$view = new \view\LoginView($this->navigationView);
+			$login = new \controller\LoginController($model, $view, $this->navigationView);
 
 			// Handle input 
 			$login->isLoggedIn();

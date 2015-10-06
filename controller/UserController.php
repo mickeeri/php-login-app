@@ -26,6 +26,7 @@ class UserController
 			if ($user != null) {
 				try {
 					$this->model->add($user);
+					$this->view->setRegistrationHasSucceeded();
 				} catch (\Exception $e) {
 					//$this->view->setDuplicate();
 					$this->view->setMessage($e->getMessage());	// Or other error.			

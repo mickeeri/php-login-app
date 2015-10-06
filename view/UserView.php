@@ -17,6 +17,8 @@ class UserView
 	private static $passwordConfirmationPostID = "passwordConfirmation";
 
 	public $message = "";
+
+	private static $registrationHasSucceeded = false;
 	
 	public function __construct(\model\UserFacade $m, \view\NavigationView $navigationView)
 	{
@@ -33,6 +35,9 @@ class UserView
 	}
 
 	public function response() {
+		if(self::$registrationHasSucceeded) {
+			$this->navigationView->redirect("Registerd new user.");
+		}
 		return $this->getHTML();
 	}
 
@@ -48,7 +53,7 @@ class UserView
 		$passwordConfirmation = $_POST[self::$passwordConfirmationPostID];
 
 		try {
-			return new \model\User($userID, $userName, $password);
+			return new \model\User($userID, $userName, $password);			
 		} catch (\model\NoUserIdException $e) {
 			$this->message = "No user id set.";
 		} catch (\model\NoUserNameException $e) {
@@ -73,9 +78,9 @@ class UserView
 		return "
 		<p>$this->message</p>
 		<form method='post'>" . 
-			$this->getTextField("Name", self::$userNamePostID) . "</br>" .
-			$this->getTextField("Password", self::$passwordPostID) . "</br>" .
-			$this->getTextField("Repeat password", self::$passwordConfirmationPostID) . "</br>" .
+			$this->getTextField("Name", self::$userNamePostID, "text") . "</br>" .
+			$this->getTextField("Password", self::$passwordPostID, "password") . "</br>" .
+			$this->getTextField("Repeat password", self::$passwordConfirmationPostID, "password") . "</br>" .
 		"<input type='submit' name='".self::$submitPostID."'>
 		</form>"; //. $this->catalog->getHTML();
 	}
@@ -102,14 +107,17 @@ class UserView
 	 * @param  string $name  input name and id
 	 * @return void        BUT generates output as html.
 	 */
-	private function getTextField($title, $name){
+	private function getTextField($title, $name, $type){
 		$value = $this->getPostField($name);
 		return "
 			<label for='$name'>$title :</label>
-			<input id='$name' type='text' value='$value' name='$name'></input>
+			<input id='$name' type='$type' value='$value' name='$name'></input>
 			";
 	}
 
+	public function setRegistrationHasSucceeded() {
+		self::$registrationHasSucceeded = true; 
+	}
 
 }
 
