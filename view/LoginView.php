@@ -13,36 +13,38 @@ class LoginView {
 	private static $cookiePassword = 'LoginView::CookiePassword';
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
-	private static $cookieMessage = 'LoginView::CookieMessage';
-	private static $message; 
+	//private static $cookieMessage = 'LoginView::CookieMessage';
+	//private static $message; 
 	// Username-field value.
 	public $nameFieldValue;
+	//private $message = "";
+	public static $message;
 
-	public function __construct(\view\NavigationView $navigationView) {	
-		$this->navigationView = $navigationView;
+	//public $message = "";
+
+	private $loginModel;
+
+	public function __construct(\model\LoginModel $loginModel, \view\AppView $appView) {	
+		$this->appView = $appView;
 		$this->cookieStorage = new CookieStorage();
+		$this->loginModel = $loginModel;
 	}	
 
 	/**
 	 * Creates HTTP response. 
-	 * @param  function $isLoggedIn function in LoginController. True if user is logged in.
 	 * @return void BUT writes to standard output and cookies!
 	 */
 	public function response() {
 
-		//$message = self::$message;	
+		$message = self::$message;	
 
-		// See if there is welcome- or bye-bye-message stored as cookie.
-		if($this->cookieStorage->load(self::$cookieMessage) !== "") {
-			$message = $this->cookieStorage->load(self::$cookieMessage);
-		} else {
-			$message = $this->navigationView->getSessionMessage();
+		// See if there is feedback message stored in cookie.
+		if($this->appView->getCookieMessage() !== "") {
+			$message = $this->appView->getCookieMessage();
 		}
 		
-		
-		
-		// isloggedin. fråga modellen. 
-		if(false) {
+		// Asks to model if the user is logged in. 
+		if($this->loginModel->sessionIsSet($this->appView->getClientIdentifier())) {
 			$response = $this->generateLogoutButtonHTML($message);
 		} else {
 			$response = $this->generateLoginFormHTML($message);
@@ -170,17 +172,17 @@ class LoginView {
 	 * Sets a feedback-message as cookie to be displayed after reload.
 	 * @param string $message
 	 */
-	public function setCookieMessage($message) {
-		setcookie(self::$cookieMessage, $message, -1);
-	}
+	// public function setCookieMessage($message) {
+	// 	setcookie(self::$cookieMessage, $message, -1);
+	// }
 
 	/**
 	 * Sets message.
 	 * @param string $message
 	 */
-	public function setMessage($message) {
-		self::$message = $message;
-	}
+	// public function setMessage($message) {
+	// 	self::$message = $message;
+	// }
 	
 	/**
 	 * Creates Username and Password cookie if user wants to be remembered.
@@ -198,19 +200,19 @@ class LoginView {
 	 * @param  string $message, To be stored in cookie and displayed after reload.
 	 * @return void
 	 */
-	public function reloadPage($message) {
-		// Now does this in navigationView;
-		$this->setCookieMessage($message);
-		header('Location: '.$_SERVER['REQUEST_URI']);
-		exit();	
-	}
+	// public function reloadPage($message) {
+	// 	// Now does this in navigationView;
+	// 	$this->setCookieMessage($message);
+	// 	header('Location: '.$_SERVER['REQUEST_URI']);
+	// 	exit();	
+	// }
 
 	
-	/**
-	 * Provides informatino on users browser. 
-	 * @return string, User agent
-	 */
-	public function getClientIdentifier() {
-		return $_SERVER["HTTP_USER_AGENT"];
-	}
+	// *
+	//  * Provides information on users browser. 
+	//  * @return string, User agent
+	 
+	// public function getClientIdentifier() {
+	// 	return $_SERVER["HTTP_USER_AGENT"];
+	// }
 }

@@ -5,14 +5,16 @@
 // require_once('view/DateTimeView.php');
 // require_once('view/LayoutView.php');
 // require_once('controller/LoginController.php');
-// require_once('model/LoginModel.php');
+require_once('model/LoginModel.php');
 // require_once('view/Messages.php');
+// 
+
 
 require_once('view/Messages.php');
-require_once("view/NavigationView.php");
-
+require_once("view/AppView.php");
 require_once('view/LayoutView.php');
 require_once('view/DateTimeView.php');
+
 require_once('controller/AppController.php');
 
 // // MAKE SURE ERRORS ARE SHOWN... MIGHT WANT TO TURN THIS OFF ON A PUBLIC SERVER
@@ -35,21 +37,23 @@ session_start();
 // $c = new \controller\LoginController($m, $v);
 // 
 // 
-$ac = new \controller\AppController();
+$lm = new \model\LoginModel();
+$nv = new \view\AppView();
+$ac = new \controller\AppController($lm, $nv);
 $ac->handleInput();
 
 $view = $ac->generateOutput();
 
 $dtv = new \view\DateTimeView();
 $lv = new \view\LayoutView();
-$nv = new \view\NavigationView();
+
 
 // Returns true if user has session or is stored in file.
 //$isLoggedIn = $c->isLoggedIn();
-//
+//var_dump($lm->sessionIsSet($nv->getClientIdentifier()));
 
 // Render layout and login-form. 
-$lv->render(false, $view, $dtv, $nv);
+$lv->render($lm->sessionIsSet($nv->getClientIdentifier()), $view, $dtv, $nv);
 
 
 //$lv->render($m->isLoggedIn($v->getUserClient()), $v, $dtv);

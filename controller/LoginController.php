@@ -7,13 +7,22 @@ namespace controller;
 //require_once("view/NavigationView.php");
 
 class LoginController {
-	//private $loginModel;
-	//private $navigationView;
-	private static $isLoggedIn = false;
+	private $loginModel;
+	private $loginView;
+	private $appView;
+	//private $appView;
+	//public static $isLoggedIn = false;
 
-	public function __construct(\model\LoginModel $loginModel, \view\LoginView $loginView) {				
+	/**
+	 * Created in AppController.
+	 * @param \model\LoginModel $loginModel [description]
+	 * @param \view\LoginView   $loginView  [description]
+	 * @param \view\AppView     $appView    [description]
+	 */
+	public function __construct(\model\LoginModel $loginModel, \view\LoginView $loginView, \view\AppView $appView) {				
 		$this->loginModel = $loginModel;
 		$this->loginView = $loginView;
+		$this->appView = $appView;
 		//$this->navigationView = $navigationView;
 	}
 
@@ -25,27 +34,29 @@ class LoginController {
 	public function doLogin(){
 		$loginView = $this->loginView;
 		$loginModel = $this->loginModel;
+		
 		// Get information on users client from view.
-		$client = $loginView->getClientIdentifier();
+		$client = $this->appView->getClientIdentifier();
 
 		// Session is set and user is logged in. 
-		if($this->loginModel->sessionIsSet($client)) {								
+		if($loginModel->sessionIsSet($client)) {								
 
 			// User wants to log out.
-			if($this->loginView->didUserPressLogoutButton()) {
-				return $this->logout(\view\MessageView::$regularLogout);
+			if($loginView->didUserPressLogoutButton()) {
+				$this->logout(\view\MessageView::$regularLogout);
 			}
 
-			return true;
+			//self::$isLoggedIn = true;
 		}		
 		// If session is missing but user is remembered in persistent storage.
 		elseif($loginModel->hasBeenRemembered($loginView->getUserNameCookie(), $loginView->getPasswordCookie())) {
 			
 			// Creates new user session.
-			$this->loginModel->createUserSession($this->loginView->getUserNameCookie(), $client);
-			$loginView->reloadPage(\view\MessageView::$welcomeBack);
+			$this->loginModel->createUserSession($loginView->getUserNameCookie(), $client);
+			//$loginView->reloadPage(\view\MessageView::$welcomeBack);
+			$this->appView->redirect(\view\MessageView::$welcomeBack);
 
-			//return true;
+			//self::$isLoggedIn = true;
 		}
 		// Cookies exists but don't pass the hasBeenRemembered method and therefore are manipulated.
 		elseif ($loginView->getUserNameCookie() !== null && $loginView->getPasswordCookie() !== null) {
@@ -58,8 +69,8 @@ class LoginController {
 			if($this->loginView->didUserPressLoginButton()) {				
 				
 				// Gets input from view.
-				$userName = $this->loginView->getRequestUserName();
-				$password = $this->loginView->getRequestPassword();
+				$userName = $loginView->getRequestUserName();
+				$password = $loginView->getRequestPassword();
 
 				// If user has checked "Keep me logged in"-checkbox.
 				if($this->loginView->isKeepMeLoggedInChecked()) {
@@ -70,15 +81,15 @@ class LoginController {
 						$randomStringPassword = $loginModel->getRandomStringPassword();						
 						$this->loginView->setCookies($userName, $randomStringPassword, $cookieExpirationTime);
 						$loginModel->rememberUser($userName, $randomStringPassword, $cookieExpirationTime);
-						return $this->login($userName, $password, $client, \view\MessageView::$loginCookie);
+						$this->login($userName, $password, $client, \view\MessageView::$loginCookie);
 					}									
 				} 
 				// Regular login without "Keep me logged in" checked.
 				else {
-					return $this->login($userName, $password, $client, \view\MessageView::$regularLogin);
+					$this->login($userName, $password, $client, \view\MessageView::$regularLogin);
 				}
 			}
-			return false;
+			//self::$isLoggedIn = false;
 		}
 	}
 
@@ -94,9 +105,10 @@ class LoginController {
 		// Calls method authorize in model.
 		if($this->loginModel->authorize($userName, $password)) {					
 			$this->loginModel->createUserSession($userName, $client);
-			$this->loginView->reloadPage($message);
+			//$this->loginView->reloadPage($message);
+			$this->appView->redirect($message);
 
-			return true;
+			//return true;
 		}
 
 		return false;
@@ -111,12 +123,21 @@ class LoginController {
 		$this->loginModel->forgetUser();
 		$this->loginModel->removeUserSession();
 		$this->loginView->destroyCookies();
-		$this->loginView->reloadPage($message);
+		//$this->loginView->reloadPage($message);
+		$this->appView->redirect($message);
 
-		return false;
+		//return false;
 	}
 
+	/**
+	 * Call from AppController
+	 * @return LoginView loginView
+	 */
 	public function getView() {
 		return $this->loginView;
 	}
+
+	// public function getIsLoggedIn() {
+	// 	return self::$isLoggedIn;
+	// }
 }

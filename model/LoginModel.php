@@ -10,16 +10,19 @@ class LoginModel {
 	private static $userClientSession = "LoginModel::UserClientSession";
 	private static $folder = "data/";
 
+	/**
+	 * [__construct description]
+	 */
 	public function __construct() {
 		//$this->loginView = $loginView;
-		$this->correctUserName = "Admin";
-		$this->correctPassword = "Password";
+		$this->correctUserName = "admin";
+		$this->correctPassword = "pass";
 	}
 
 	/**
 	 * Checks if user session exists.
-	 * @param  string $client, Information on users browser.
-	 * @return boolean, True if session is set.
+	 * @param  string $client information on users browser
+	 * @return boolean true if session is set
 	 */
 	public function sessionIsSet($client) {
 
@@ -47,11 +50,10 @@ class LoginModel {
 				throw new \Exception(\view\MessageView::$wrongCredentials);
 			}
 
-		return true;
+			return true;
 			
 		} catch (\Exception $e) {
-			// TODO find other way to display message. Kasta egna exceptions t.ex. NoUsernameException.
-			//$this->loginView->setMessage($e->getMessage()); 
+			\view\LoginView::$message = $e->getMessage(); 
 			return false;
 		}
 	}
