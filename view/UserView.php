@@ -17,9 +17,7 @@ class UserView
 	private static $passwordConfirmationPostID = "passwordConfirmation";
 
 	public $message = "";
-
 	
-
 	public function __construct(\model\UserFacade $m, \view\NavigationView $navigationView)
 	{
 		$this->userFacade = $m;
@@ -59,6 +57,8 @@ class UserView
 			$this->message = "Password can't be blank.";
 		} catch (\model\NoPasswordConfirmationException $e) {
 			$this->message = "Password confirmation can't be blank.";
+		} catch (\model\PasswordConfirmationMatchException $e) {
+			$this->message = "Password and password confirmation do not match.";
 		} catch (Exception $e) {
 			$this->message = "Something went wrong. Try again!";
 		}
