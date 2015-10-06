@@ -31,19 +31,23 @@ class UserDAL
 
 	}
 
+	/**
+	 * Add new user to database
+	 * @param User $userToBeAdded user object
+	 */
 	public function add(User $userToBeAdded){
+		
 		$stmt = $this->database->prepare("INSERT INTO `phpassignment`.`Users`(
-			`userID`, `userName`, `password`) 
-				VALUES (?, ?, ?)");
+			`userName`, `password`) 
+				VALUES (?, ?)");
 
 		if ($stmt === false) {
 			throw new \Exception($this->database->error);
 		}
 
-		$userID = null;
 		$userName = $userToBeAdded->getUserName();
 		$password = $userToBeAdded->getPassword();
-		$stmt->bind_param('iss', $userID, $userName, $password);
+		$stmt->bind_param('ss', $userName, $password);
 
 		$stmt->execute();
 	}

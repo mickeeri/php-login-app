@@ -47,13 +47,13 @@ class UserView
 	 */
 	public function getUser(){
 		//$userID = $_POST[self::$userIDPostID];
-		$userID = 0;
+		//$userID = 0;
 		$userName = $_POST[self::$userNamePostID];
 		$password = $_POST[self::$passwordPostID];
 		$passwordConfirmation = $_POST[self::$passwordConfirmationPostID];
 
 		try {
-			return new \model\User($userID, $userName, $password);			
+			return new \model\User($userName, $password, $passwordConfirmation);			
 		} catch (\model\NoUserIdException $e) {
 			$this->message = "No user id set.";
 		} catch (\model\NoUserNameException $e) {
