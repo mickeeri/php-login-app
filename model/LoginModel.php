@@ -9,14 +9,16 @@ class LoginModel {
 	private static $userSession = "LoginModel::UserSession";
 	private static $userClientSession = "LoginModel::UserClientSession";
 	private static $folder = "data/";
+	private $userFacade;
 
 	/**
 	 * [__construct description]
 	 */
-	public function __construct() {
+	public function __construct(\model\userFacade $userFacade) {
 		//$this->loginView = $loginView;
 		$this->correctUserName = "admin";
 		$this->correctPassword = "pass";
+		$this->userFacade = $userFacade;
 	}
 
 	/**
@@ -38,15 +40,20 @@ class LoginModel {
 	 * @param  string $password 
 	 * @return boolean, True if input matches correct credentials.
 	 */
-	public function authorize($userName, $password) {
+	public function authorize($enteredUserName, $enteredPassword) {
+	
+		$user = $this->userFacade->getUser($enteredUserName);
 
 		try {
-			if($userName == "") {
-				throw new \Exception(\view\MessageView::$userNameMissing);			
-			} elseif ($password == "") {
-				//$this->loginView->nameFieldValue = $userName;
+			if($enteredUserName == "") {
+				throw new \Exception(\view\MessageView::$enteredUserNameMissing);			
+			} elseif ($enteredPassword == "") {
+				//$this->loginView->nameFieldValue = $enteredUserName;
 				throw new \Exception(\view\MessageView::$passWordMissing);				
-			} elseif ($userName !== $this->correctUserName || $password !== $this->correctPassword) {
+			} 
+
+
+			if ($enteredUserName !== $this->correctUserName || $enteredPassword !== $this->correctPassword) {
 				throw new \Exception(\view\MessageView::$wrongCredentials);
 			}
 

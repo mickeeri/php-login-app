@@ -11,12 +11,14 @@ class UserView
 {
 	/// https://github.com/dntoll/1DV608/blob/master/lectures/LectureCode/view/AdminView.php
 
-	private static $submitPostID = "register";
-	private static $userNamePostID = "name";
-	private static $passwordPostID = "password";
+	private static $submitPostID = "UserView::Login";
+	private static $userNamePostID = "UserView::Username";
+	private static $passwordPostID = "UserView::Password";
+	private static $messageID = "UserView::Message";
 	private static $passwordConfirmationPostID = "passwordConfirmation";
 
 	public $message = "";
+	public $messageArray = array();
 
 	private static $registrationHasSucceeded = false;
 	
@@ -34,11 +36,15 @@ class UserView
 		return isset($_POST[self::$submitPostID]);
 	}
 
+	/**
+	 * Creates proper response based on registration success or not
+	 */
 	public function response() {
 		if(self::$registrationHasSucceeded) {
 			$this->appView->redirect("Registerd new user.");
-		}
-		return $this->getHTML();
+		} else {
+			return $this->getHTML();
+		}		
 	}
 
 	/**
@@ -54,16 +60,16 @@ class UserView
 
 		try {
 			return new \model\User($userName, $password, $passwordConfirmation);			
-		} catch (\model\NoUserIdException $e) {
-			$this->message = "No user id set.";
+		} catch (\model\NoCredentialsException $e) {
+			$this->message = "Username has too few characters, at least 3 characters.</br>Password has too few characters, at least 6 characters.";
 		} catch (\model\NoUserNameException $e) {
-			$this->message = "You have to enter name";
+			$this->message = "Username has too few characters, at least 3 characters.";
 		} catch (\model\NoPasswordException $e) {
-			$this->message = "Password can't be blank.";
-		} catch (\model\NoPasswordConfirmationException $e) {
-			$this->message = "Password confirmation can't be blank.";
+			$this->message = "Password has too few characters, at least 6 characters.";
+		} catch (\model\UserNameInvalidCharException $e) {
+			$this->message = "Username contains invalid characters.";
 		} catch (\model\PasswordConfirmationMatchException $e) {
-			$this->message = "Password and password confirmation do not match.";
+			$this->message = "Passwords do not match.";
 		} catch (Exception $e) {
 			$this->message = "Something went wrong. Try again!";
 		}
@@ -75,14 +81,17 @@ class UserView
 	 * @return void BUT returns standard output.
 	 */
 	public function getHTML(){
-		return "
-		<p>$this->message</p>
-		<form method='post'>" . 
-			$this->getTextField("Name", self::$userNamePostID, "text") . "</br>" .
-			$this->getTextField("Password", self::$passwordPostID, "password") . "</br>" .
-			$this->getTextField("Repeat password", self::$passwordConfirmationPostID, "password") . "</br>" .
-		"<input type='submit' name='".self::$submitPostID."'>
-		</form>"; //. $this->catalog->getHTML();
+		return "		
+		<fieldset>
+			<legend>Register a new user - Write username and password</legend>
+			<p id=" . self::$messageID . ">" . $this->message . "</p>
+			<form method='post'>" . 
+				$this->getTextField("Name", self::$userNamePostID, "text") . "</br>" .
+				$this->getTextField("Password", self::$passwordPostID, "password") . "</br>" .
+				$this->getTextField("Repeat password", self::$passwordConfirmationPostID, "password") . "</br>" .
+			"<input type='submit' name='".self::$submitPostID."' value='Register'>
+			</form>
+		</fieldset>";
 	}
 
 	/**
@@ -91,15 +100,17 @@ class UserView
 	 * @return [type]        [description]
 	 */
 	private function getPostField($field){
-		if (isset($_POST[$field])) {
-			return trim($_POST[$field]);
+		if (isset($_POST[$field])) {			
+			// Trims and removes special chars. 
+			return filter_var(trim($_POST[$field]), FILTER_SANITIZE_STRING);
+			//return trim($_POST[$field]);
 		}
 		return  "";
 	}
 
-	public function setMessage($message){
-		$this->message = $message;
-	}
+	// public function setMessage($message){
+	// 	$this->message = $message;
+	// }
 
 	/**
 	 * Renders text fields for user input.
@@ -117,6 +128,10 @@ class UserView
 
 	public function setRegistrationHasSucceeded() {
 		self::$registrationHasSucceeded = true; 
+	}
+
+	public function setUserExists() {
+		$this->message = "User exists, pick another username.";
 	}
 
 }

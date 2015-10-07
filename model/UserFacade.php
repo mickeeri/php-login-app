@@ -17,10 +17,18 @@ class UserFacade
 
 	/**
 	 * Add user to database.
-	 * @param User $u user to be added
+	 * @param model\User $userToBeAdded
 	 */
-	public function add(User $u){
-		$this->dal->add($u);
+	public function saveUser(User $userToBeAdded){
+
+		$users = $this->getUsers();
+		foreach ($users as $user) {
+			if ($user->getUserName() === $userToBeAdded->getUserName()) {
+				throw new \Exception("You cannot have two users with same username.");
+			}
+		}
+
+		$this->dal->add($userToBeAdded);
 	}
 
 	/**
@@ -29,5 +37,9 @@ class UserFacade
 	 */
 	public function getUsers(){
 		return $this->dal->getUsers();
+	}
+
+	public function getUser($userName) {
+		return $this->dal->getUserByUserName($userName);
 	}
 }

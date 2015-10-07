@@ -23,11 +23,10 @@ class UserController {
 			$user = $this->userView->getUser();
 			if ($user != null) {
 				try {
-					$this->userFacade->add($user);
+					$this->userFacade->saveUser($user);
 					$this->userView->setRegistrationHasSucceeded();
 				} catch (\Exception $e) {
-					//$this->userView->setDuplicate();
-					$this->userView->setMessage($e->getMessage());	// Or other error.			
+					$this->userView->setUserExists();		
 				}
 			}
 		}

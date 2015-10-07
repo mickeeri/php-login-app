@@ -36,10 +36,10 @@ session_start();
 // $v = new \view\LoginView($m);
 // $c = new \controller\LoginController($m, $v);
 // 
-// 
-$lm = new \model\LoginModel();
-$nv = new \view\AppView();
-$ac = new \controller\AppController($lm, $nv);
+//$uf = new \model\userFacade(); 
+//$lm = new \model\LoginModel();
+$av = new \view\AppView();
+$ac = new \controller\AppController($av);
 $ac->handleInput();
 
 $view = $ac->generateOutput();
@@ -53,7 +53,7 @@ $lv = new \view\LayoutView();
 //var_dump($lm->sessionIsSet($nv->getClientIdentifier()));
 
 // Render layout and login-form. 
-$lv->render($lm->sessionIsSet($nv->getClientIdentifier()), $view, $dtv, $nv);
+$lv->render($ac->isLoggedIn(), $view, $dtv, $av);
 
 
 //$lv->render($m->isLoggedIn($v->getUserClient()), $v, $dtv);

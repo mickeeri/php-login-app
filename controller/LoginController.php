@@ -10,6 +10,7 @@ class LoginController {
 	private $loginModel;
 	private $loginView;
 	private $appView;
+	private $userFacade;
 	//private $appView;
 	//public static $isLoggedIn = false;
 
@@ -23,6 +24,7 @@ class LoginController {
 		$this->loginModel = $loginModel;
 		$this->loginView = $loginView;
 		$this->appView = $appView;
+		$this->userFacade = $userFacade;
 		//$this->navigationView = $navigationView;
 	}
 
@@ -97,21 +99,26 @@ class LoginController {
 	 * Performs login attempt. Returns true if successful.
 	 * @param  string $userName
 	 * @param  string $password 
-	 * @param  string $client, Users browser.
-	 * @param  string $message, Message that is to be displayed after sign in.
-	 * @return boolean, Returns true if logged in.
+	 * @param  string $client Users browser.
+	 * @param  string $message Message that is to be displayed after sign in.
+	 * @return boolean redirects on successful login, returns false if unsuccesful
 	 */
 	public function login($userName, $password, $client, $message) {
-		// Calls method authorize in model.
-		if($this->loginModel->authorize($userName, $password)) {					
-			$this->loginModel->createUserSession($userName, $client);
-			//$this->loginView->reloadPage($message);
-			$this->appView->redirect($message);
+		try {
+			// Calls method authorize in model.
+			if($this->loginModel->authorize($userName, $password)) {					
+				$this->loginModel->createUserSession($userName->getUserName(), $client);
+				//$this->loginView->reloadPage($message);
+				$this->appView->redirect($message);
 
-			//return true;
-		}
+				//return true;
+			}
 
-		return false;
+			return false;
+
+		} catch (\model\UserDontExistException $e) {
+			$this->appView->redirect(\view\MessageView::$userDontExist);
+		}		
 	}
 
 	/**

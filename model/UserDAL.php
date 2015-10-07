@@ -2,6 +2,8 @@
 
 namespace model;
 
+class UserDontExistException extends \Exception {};
+
 /**
 *
 */
@@ -28,7 +30,24 @@ class UserDAL
 	}
 
 	public function getUsers(){
+		$users = array();
 
+		$stmt = $this->database->prepare("SELECT * FROM " . self::$table);
+		if ($stmt === false) {
+			throw new \Exception($this->database->error);
+		}
+
+		$stmt->execute();
+
+		$stmt->bind_result($userID, $userName, $password);
+
+		while ($stmt->fetch()) {
+			$user = new User($userName, $password, $password);
+			$user->setUserID($userID);
+			$users[] = $user;
+		}
+
+		return $users;
 	}
 
 	/**
@@ -50,5 +69,33 @@ class UserDAL
 		$stmt->bind_param('ss', $userName, $password);
 
 		$stmt->execute();
+	}
+
+	/**
+	 * Get user by typing in userName
+	 * @return [type] [description]
+	 */
+	public function getUserByUserName($userName) {
+		$stmt = $this->database->prepare("SELECT * FROM Users WHERE userName=?");
+
+		if ($stmt === false) {
+			throw new \Exception($this->database->error);
+		}
+
+		$stmt->bind_param("s", $userName);
+		
+		$stmt->execute();
+
+		$stmt->bind_result($userID, $userName, $password);
+
+		$stmt->fetch();
+
+		if ($userName === null) {
+			throw new UserDontExistException();
+		}
+
+		$user = new User($userName, $password, $password);
+		$user->setUserID($userID);
+		return $user;
 	}
 }
