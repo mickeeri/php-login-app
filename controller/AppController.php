@@ -3,15 +3,12 @@
 namespace controller;
 
 // Models
-//require_once("model/LoginModel.php");
-
 require_once("model/UserDAL.php");
 require_once("model/UserModel.php");
 require_once("model/UserFacade.php");
 
 // Views
-require_once("view/UserView.php");
-//require_once("view/NavigationView.php");
+require_once("view/RegisterView.php");
 require_once("view/LoginView.php");
 
 // Controllers
@@ -30,7 +27,6 @@ class AppController {
 
 	/**
 	 * Created in index.php
-	 * @param \model\LoginModel $loginModel 
 	 * @param \view\AppView     $appView  
 	 */
 	function __construct(\view\AppView $appView) {
@@ -47,9 +43,11 @@ class AppController {
 		$this->appView = $appView;
 	}
 
+	/**
+	 * Based on input method selects either LoginView or RegisterView.
+	 */
 	public function handleInput() {
 		if ($this->appView->onLoginPage()) {
-			//$model = new \model\LoginModel();
 			$view = new \view\LoginView($this->loginModel, $this->appView);
 			$login = new \controller\LoginController($this->loginModel, $view, $this->appView);
 
@@ -57,8 +55,7 @@ class AppController {
 			$login->doLogin();
 			$this->view = $login->getView();
 		} else {
-			//$model = new \model\UserFacade($this->userDAL);
-			$this->view = new \view\UserView($this->userFacade, $this->appView);
+			$this->view = new \view\RegisterView($this->userFacade, $this->appView);
 			$uc = new \controller\UserController($this->userFacade, $this->view, $this->appView);
 
 			$uc->addUser();
@@ -66,10 +63,18 @@ class AppController {
 		$this->mysqli->close();
 	}
 
+	/**
+	 * Generates current view.
+	 * @return \view\LoginView | \view\RegisterView
+	 */
 	public function generateOutput() {
 		return $this->view;
 	}
 
+	/**
+	 * Checks if user is logged in or not.
+	 * @return boolean
+	 */
 	public function isLoggedIn() {
 		return $this->loginModel->sessionIsSet($this->appView->getClientIdentifier());
 	}

@@ -49,11 +49,11 @@ class AppView {
 		return "";
 	}
 
-	public function getCookieMessage() {
-		$ret = isset($_COOKIE[self::$messageCookieName]) ? $_COOKIE[self::$messageCookieName] : "";
-		setcookie(self::$messageCookieName, "", time() - 1);
-		return $ret;
-	}
+	// public function getCookieMessage() {
+	// 	$ret = isset($_COOKIE[self::$messageCookieName]) ? $_COOKIE[self::$messageCookieName] : "";
+	// 	setcookie(self::$messageCookieName, "", time() - 1);
+	// 	return $ret;
+	// }
 
 	public function getSavedUserName() {
 		$ret = isset($_COOKIE[self::$newUserCookieName]) ? $_COOKIE[self::$newUserCookieName] : "";
@@ -66,8 +66,8 @@ class AppView {
 	 * @param  string $message feedback to user
 	 */
 	public function redirect($message) {
-		//$_SESSION[self::$sessionSaveLocation] = $message;
-		setcookie(self::$messageCookieName, $message, -1);
+		$_SESSION[self::$sessionSaveLocation] = $message;
+		//setcookie(self::$messageCookieName, $message, -1);
 		$actual_link = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
 		header("Location: $actual_link");
 		exit();

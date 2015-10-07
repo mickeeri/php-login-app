@@ -109,7 +109,7 @@ class LoginController {
 			$this->appView->redirect(\view\MessageView::$wrongCredentials);
 		} catch (\model\WrongCredentialsException $e) {
 			$this->appView->redirect(\view\MessageView::$wrongCredentials);
-		}	
+		} 
 	}
 
 	/**

@@ -9,7 +9,6 @@ class UserNameInvalidCharException extends \Exception {};
 class PasswordConfirmationMatchException extends \Exception {};
 
 class User {
-	//https://github.com/dntoll/1DV608/blob/master/lectures/LectureCode/model/Product.php
 	
 	private $userID;
 	private $userName;

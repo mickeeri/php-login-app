@@ -36,11 +36,13 @@ class LoginView {
 	 */
 	public function response() {
 
-		$message = self::$message;	
+		$message = self::$message;
 
-		// See if there is feedback message stored in cookie.
-		if($this->appView->getCookieMessage() !== "") {
-			$message = $this->appView->getCookieMessage();
+		$sessionMessage = $this->appView->getSessionMessage();
+
+		// Replace $message with message stored in session if that is not empty string.
+		if ($sessionMessage !== "") {
+			$message = $sessionMessage;
 		}
 		
 		// Asks to model if the user is logged in. 

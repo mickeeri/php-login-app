@@ -6,8 +6,6 @@ class WrongCredentialsException extends \Exception {};
 
 class LoginModel {
 
-	private $correctUserName;
-	private $correctPassword;
 	private static $userSession = "LoginModel::UserSession";
 	private static $userClientSession = "LoginModel::UserClientSession";
 	private static $folder = "data/";

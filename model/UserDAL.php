@@ -18,15 +18,6 @@ class UserDAL
 	 */
 	function __construct(\mysqli $db) {
 		$this->database = $db;
-
-		// $stmt = $this->database->prepare("SELECT * FROM " . self::$table);
-		// if ($stmt === false) {
-		// 	throw new \Exception($this->database->error);
-		// }
-
-		// $stmt->execute();
-
-		// $stmt->bind_result($userName, $password);
 	}
 
 	public function getUsers(){
