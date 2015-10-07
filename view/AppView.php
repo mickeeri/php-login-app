@@ -65,10 +65,10 @@ class AppView {
 	 * Saves message and redirects user to index page.
 	 * @param  string $message feedback to user
 	 */
-	public function redirect($message, $urlString) {
+	public function redirect($message) {
 		//$_SESSION[self::$sessionSaveLocation] = $message;
 		setcookie(self::$messageCookieName, $message, -1);
-		$actual_link = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'] . $urlString;
+		$actual_link = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
 		header("Location: $actual_link");
 		exit();
 	}

@@ -11,11 +11,11 @@ class UserView
 {
 	/// https://github.com/dntoll/1DV608/blob/master/lectures/LectureCode/view/AdminView.php
 
-	private static $submitPostID = "UserView::Login";
-	private static $userNamePostID = "UserView::Username";
-	private static $passwordPostID = "UserView::Password";
-	private static $messageID = "UserView::Message";
-	private static $passwordConfirmationPostID = "passwordConfirmation";
+	private static $submitPostID = "RegisterView::Login";
+	private static $userNamePostID = "RegisterView::UserName";
+	private static $passwordPostID = "RegisterView::Password";
+	private static $messageID = "RegisterView::Message";
+	private static $passwordConfirmationPostID = "RegisterView::PasswordRepeat";
 
 	public $message = "";
 	public $messageArray = array();
@@ -87,9 +87,9 @@ class UserView
 			<legend>Register a new user - Write username and password</legend>
 			<p id=" . self::$messageID . ">" . $this->message . "</p>
 			<form method='post'>" . 
-				$this->getTextField("Name", self::$userNamePostID, "text") . "</br>" .
-				$this->getTextField("Password", self::$passwordPostID, "password") . "</br>" .
-				$this->getTextField("Repeat password", self::$passwordConfirmationPostID, "password") . "</br>" .
+				$this->getTextField("Name", self::$userNamePostID, "text") . "<br>" .
+				$this->getTextField("Password", self::$passwordPostID, "password") . "<br>" .
+				$this->getTextField("Repeat password", self::$passwordConfirmationPostID, "password") . "<br>" .
 			"<input type='submit' name='".self::$submitPostID."' value='Register'>
 			</form>
 		</fieldset>";
@@ -123,7 +123,7 @@ class UserView
 		$value = $this->getPostField($name);
 		return "
 			<label for='$name'>$title :</label>
-			<input id='$name' type='$type' value='$value' name='$name'></input>
+			<input id='$name' type='$type' value='$value' name='$name'>
 			";
 	}
 

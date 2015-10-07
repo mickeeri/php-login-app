@@ -105,7 +105,8 @@ class LoginController {
 				return false;
 			}				
 		} catch (\model\UserDontExistException $e) {
-			$this->appView->redirect(\view\MessageView::$userDontExist);
+			//$this->appView->redirect(\view\MessageView::$userDontExist);
+			$this->appView->redirect(\view\MessageView::$wrongCredentials);
 		} catch (\model\WrongCredentialsException $e) {
 			$this->appView->redirect(\view\MessageView::$wrongCredentials);
 		}	

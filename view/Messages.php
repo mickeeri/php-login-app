@@ -15,5 +15,5 @@ class MessageView {
 	public static $userNameMissing = "Username is missing";
 	public static $passWordMissing = "Password is missing";
 	public static $wrongCredentials = "Wrong name or password";
-	public static $userDontExist = "There is no user with that user name";
+	//public static $userDontExist = "There is no user with that user name";
 }

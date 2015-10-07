@@ -34,7 +34,8 @@ class AppController {
 	 * @param \view\AppView     $appView  
 	 */
 	function __construct(\view\AppView $appView) {
-		$this->mysqli = new \mysqli("localhost", "root", "", "phpassignment");
+		// Lägg detta i någon annan fil. 
+		$this->mysqli = new \mysqli("me222wm.se.mysql", "me222wm_se", "6aVQjh4v", "me222wm_se");
 		if(mysqli_connect_errno()) {
 			printf("Connect failed: %s\n", mysqli_connect_error());
 			exit();

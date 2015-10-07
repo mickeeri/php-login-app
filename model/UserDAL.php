@@ -56,7 +56,7 @@ class UserDAL
 	 */
 	public function add(User $userToBeAdded){
 		
-		$stmt = $this->database->prepare("INSERT INTO `phpassignment`.`Users`(
+		$stmt = $this->database->prepare("INSERT INTO `me222wm_se`.`Users`(
 			`userName`, `password`) 
 				VALUES (?, ?)");
 
