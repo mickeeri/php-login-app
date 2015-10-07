@@ -58,7 +58,7 @@ class AppController {
 		} else {
 			//$model = new \model\UserFacade($this->userDAL);
 			$this->view = new \view\UserView($this->userFacade, $this->appView);
-			$uc = new \controller\UserController($model, $this->view, $this->appView);
+			$uc = new \controller\UserController($this->userFacade, $this->view, $this->appView);
 
 			$uc->addUser();
 		}
@@ -70,6 +70,6 @@ class AppController {
 	}
 
 	public function isLoggedIn() {
-		return $this->loginModel->sessionIsSet($this->AppView->getClientIdentifier());
+		return $this->loginModel->sessionIsSet($this->appView->getClientIdentifier());
 	}
 }

@@ -24,7 +24,7 @@ class UserController {
 			if ($user != null) {
 				try {
 					$this->userFacade->saveUser($user);
-					$this->userView->setRegistrationHasSucceeded();
+					$this->userView->setRegistrationHasSucceeded();				
 				} catch (\Exception $e) {
 					$this->userView->setUserExists();		
 				}

@@ -2,6 +2,8 @@
 
 namespace model;
 
+class WrongCredentialsException extends \Exception {};
+
 class LoginModel {
 
 	private $correctUserName;
@@ -22,7 +24,7 @@ class LoginModel {
 	}
 
 	/**
-	 * Checks if user session exists.
+	 * Checks if user session exists
 	 * @param  string $client information on users browser
 	 * @return boolean true if session is set
 	 */
@@ -35,27 +37,38 @@ class LoginModel {
 	}
 
 	/**
-	 * Authorizes users credentials.
-	 * @param  string $userName
-	 * @param  string $password 
-	 * @return boolean, True if input matches correct credentials.
+	 * Authorizes users credentials
+	 * @param  string $enteredUserName 
+	 * @param  string $enteredPassword
+	 * @return booelean true if correct password
 	 */
 	public function authorize($enteredUserName, $enteredPassword) {
 	
-		$user = $this->userFacade->getUser($enteredUserName);
+		if($this->validateInput($enteredUserName, $enteredPassword)) {
+			$user = $this->userFacade->getUser($enteredUserName);
+			$hash = $user->getPassword();
 
+			if (password_verify($enteredPassword, $hash)) {
+				return true;
+			} else {
+				throw new WrongCredentialsException();
+			}
+		}
+	}
+
+	/**
+	 * Validates that input is not empty strings
+	 * @param  string $enteredUserName 
+	 * @param  string $enteredPassword 
+	 * @return boolean             
+	 */
+	private function validateInput($enteredUserName, $enteredPassword) {
 		try {
 			if($enteredUserName == "") {
-				throw new \Exception(\view\MessageView::$enteredUserNameMissing);			
+				throw new \Exception(\view\MessageView::$userNameMissing);			
 			} elseif ($enteredPassword == "") {
-				//$this->loginView->nameFieldValue = $enteredUserName;
 				throw new \Exception(\view\MessageView::$passWordMissing);				
 			} 
-
-
-			if ($enteredUserName !== $this->correctUserName || $enteredPassword !== $this->correctPassword) {
-				throw new \Exception(\view\MessageView::$wrongCredentials);
-			}
 
 			return true;
 			
@@ -151,7 +164,7 @@ class LoginModel {
 	}
 
 	/**
-	 * Creates random string that is used as temporary password.
+	 * Creates random string that is used as temporary password
 	 * @return string, Random string.
 	 */
 	public function getRandomStringPassword() {

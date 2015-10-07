@@ -16,7 +16,7 @@ class LoginView {
 	//private static $cookieMessage = 'LoginView::CookieMessage';
 	//private static $message; 
 	// Username-field value.
-	public $nameFieldValue;
+	//public $nameFieldValue;
 	//private $message = "";
 	public static $message;
 
@@ -46,7 +46,7 @@ class LoginView {
 		// Asks to model if the user is logged in. 
 		if($this->loginModel->sessionIsSet($this->appView->getClientIdentifier())) {
 			$response = $this->generateLogoutButtonHTML($message);
-		} else {
+		} else {			
 			$response = $this->generateLoginFormHTML($message);
 		}
 
@@ -136,7 +136,7 @@ class LoginView {
 					<p id="' . self::$messageId . '">' . $message . '</p>
 					
 					<label for="' . self::$name . '">Username :</label>
-					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $this->nameFieldValue  . '" />
+					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $this->getRequestUserName()  . '" />
 
 					<label for="' . self::$password . '">Password :</label>
 					<input type="password" id="' . self::$password . '" name="' . self::$password . '" />
@@ -157,7 +157,13 @@ class LoginView {
 	 * @return string
 	 */
 	public function getRequestUserName() {
-		return isset($_POST[self::$name]) ? $_POST[self::$name] : "";
+		//return isset($_POST[self::$name]) ? trim($_POST[self::$name]) : "";
+
+		if (isset($_POST[self::$name])) {
+			return trim($_POST[self::$name]);
+		} else {
+			return $this->appView->getSavedUserName();
+		}
 	}
 
 	/**

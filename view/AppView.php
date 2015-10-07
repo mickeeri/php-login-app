@@ -15,6 +15,8 @@ class AppView {
 	private static $newUserURL = "register";
 	private static $sessionSaveLocation = "\\view\\AppView\\message";
 	private static $messageCookieName = "AppView::Message";
+	private static $fieldValueCookieName = "AppView::InputFieldValue";
+	private static $newUserCookieName = "AppView::NewUsersName";
 
 
 	/**
@@ -53,16 +55,21 @@ class AppView {
 		return $ret;
 	}
 
+	public function getSavedUserName() {
+		$ret = isset($_COOKIE[self::$newUserCookieName]) ? $_COOKIE[self::$newUserCookieName] : "";
+		setcookie(self::$newUserCookieName, "", time() - 1);
+		return $ret;
+	}
+
 	/**
 	 * Saves message and redirects user to index page.
 	 * @param  string $message feedback to user
 	 */
-	public function redirect($message) {
+	public function redirect($message, $urlString) {
 		//$_SESSION[self::$sessionSaveLocation] = $message;
 		setcookie(self::$messageCookieName, $message, -1);
-		$actual_link = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
+		$actual_link = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'] . $urlString;
 		header("Location: $actual_link");
-		// header('Location: '.$_SERVER['REQUEST_URI']);
 		exit();
 	}
 
@@ -72,5 +79,9 @@ class AppView {
 	 */
 	public function getClientIdentifier() {
 		return $_SERVER["HTTP_USER_AGENT"];
+	}
+
+	public function saveNewUsersName($userName) {
+		setcookie(self::$newUserCookieName, $userName, -1);
 	}
 }

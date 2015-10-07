@@ -41,6 +41,7 @@ class UserView
 	 */
 	public function response() {
 		if(self::$registrationHasSucceeded) {
+			$this->appView->saveNewUsersName($_POST[self::$userNamePostID]);
 			$this->appView->redirect("Registerd new user.");
 		} else {
 			return $this->getHTML();
@@ -128,6 +129,7 @@ class UserView
 
 	public function setRegistrationHasSucceeded() {
 		self::$registrationHasSucceeded = true; 
+		//$this->appView->redirect("Registerd new user.", $userName);
 	}
 
 	public function setUserExists() {

@@ -65,7 +65,7 @@ class UserDAL
 		}
 
 		$userName = $userToBeAdded->getUserName();
-		$password = $userToBeAdded->getPassword();
+		$password = password_hash($userToBeAdded->getPassword(), PASSWORD_BCRYPT);
 		$stmt->bind_param('ss', $userName, $password);
 
 		$stmt->execute();

@@ -10,21 +10,17 @@ class LoginController {
 	private $loginModel;
 	private $loginView;
 	private $appView;
-	private $userFacade;
-	//private $appView;
-	//public static $isLoggedIn = false;
 
 	/**
 	 * Created in AppController.
-	 * @param \model\LoginModel $loginModel [description]
-	 * @param \view\LoginView   $loginView  [description]
-	 * @param \view\AppView     $appView    [description]
+	 * @param \model\LoginModel $loginModel 
+	 * @param \view\LoginView   $loginView  
+	 * @param \view\AppView     $appView   
 	 */
 	public function __construct(\model\LoginModel $loginModel, \view\LoginView $loginView, \view\AppView $appView) {				
 		$this->loginModel = $loginModel;
 		$this->loginView = $loginView;
 		$this->appView = $appView;
-		$this->userFacade = $userFacade;
 		//$this->navigationView = $navigationView;
 	}
 
@@ -78,7 +74,7 @@ class LoginController {
 				if($this->loginView->isKeepMeLoggedInChecked()) {
 					
 					// If credentials are correct create cookies and remeber user in persistent storage.
-					if ($loginModel->authorize($userName, $password)) {
+					if ($this->checkCredentials($userName, $password)) {
 						$cookieExpirationTime = time()+60;
 						$randomStringPassword = $loginModel->getRandomStringPassword();						
 						$this->loginView->setCookies($userName, $randomStringPassword, $cookieExpirationTime);
@@ -91,8 +87,28 @@ class LoginController {
 					$this->login($userName, $password, $client, \view\MessageView::$regularLogin);
 				}
 			}
-			//self::$isLoggedIn = false;
 		}
+	}
+
+	/**
+	 * Checks if entered username and password is valid and credentials are correct
+	 * @param  string $userName 
+	 * @param  string $password
+	 * @return boolean      
+	 */
+	public function checkCredentials($userName, $password) {
+		try {
+			// Calls method authorize in model.
+			if ($this->loginModel->authorize($userName, $password)) {
+				return true;
+			} else {
+				return false;
+			}				
+		} catch (\model\UserDontExistException $e) {
+			$this->appView->redirect(\view\MessageView::$userDontExist);
+		} catch (\model\WrongCredentialsException $e) {
+			$this->appView->redirect(\view\MessageView::$wrongCredentials);
+		}	
 	}
 
 	/**
@@ -101,24 +117,15 @@ class LoginController {
 	 * @param  string $password 
 	 * @param  string $client Users browser.
 	 * @param  string $message Message that is to be displayed after sign in.
-	 * @return boolean redirects on successful login, returns false if unsuccesful
+	 * @return boolean redirect | false
 	 */
-	public function login($userName, $password, $client, $message) {
-		try {
-			// Calls method authorize in model.
-			if($this->loginModel->authorize($userName, $password)) {					
-				$this->loginModel->createUserSession($userName->getUserName(), $client);
-				//$this->loginView->reloadPage($message);
-				$this->appView->redirect($message);
+	private function login($userName, $password, $client, $message) {
 
-				//return true;
-			}
-
-			return false;
-
-		} catch (\model\UserDontExistException $e) {
-			$this->appView->redirect(\view\MessageView::$userDontExist);
-		}		
+		if($this->checkCredentials($userName, $password)) {					
+			$this->loginModel->createUserSession($userName, $client);
+			$this->appView->redirect($message);
+		}
+		return false;
 	}
 
 	/**
@@ -132,8 +139,6 @@ class LoginController {
 		$this->loginView->destroyCookies();
 		//$this->loginView->reloadPage($message);
 		$this->appView->redirect($message);
-
-		//return false;
 	}
 
 	/**
@@ -143,8 +148,4 @@ class LoginController {
 	public function getView() {
 		return $this->loginView;
 	}
-
-	// public function getIsLoggedIn() {
-	// 	return self::$isLoggedIn;
-	// }
 }
