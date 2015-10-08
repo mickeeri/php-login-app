@@ -2,9 +2,6 @@
 
 namespace view;
 
-/**
-* 
-*/
 class RegisterView
 {
 	private static $submitPostID = "RegisterView::Register";

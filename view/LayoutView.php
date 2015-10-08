@@ -46,6 +46,7 @@ class LayoutView {
     }
   }
 
+    // Render either link to login or link to register form. 
     private function renderNavigation($nv, $isLoggedIn) {
         if($isLoggedIn === false) {
            if($nv->onLoginPage()){

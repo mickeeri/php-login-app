@@ -2,10 +2,6 @@
 
 namespace controller;
 
-// require_once("model/LoginModel.php");
-// require_once("view/LoginView.php");
-//require_once("view/NavigationView.php");
-
 class LoginController {
 	private $loginModel;
 	private $loginView;
@@ -21,9 +17,7 @@ class LoginController {
 		$this->loginModel = $loginModel;
 		$this->loginView = $loginView;
 		$this->appView = $appView;
-		//$this->navigationView = $navigationView;
 	}
-
 	
 	/**
 	 * Performs diffrent types of sign in/sign out based on user input. Returns true if user is logged in.
@@ -43,18 +37,14 @@ class LoginController {
 			if($loginView->didUserPressLogoutButton()) {
 				$this->logout(\view\MessageView::$regularLogout);
 			}
-
-			//self::$isLoggedIn = true;
-		}		
+		}	
 		// If session is missing but user is remembered in persistent storage.
 		elseif($loginModel->hasBeenRemembered($loginView->getUserNameCookie(), $loginView->getPasswordCookie())) {
 			
 			// Creates new user session.
 			$this->loginModel->createUserSession($loginView->getUserNameCookie(), $client);
-			//$loginView->reloadPage(\view\MessageView::$welcomeBack);
 			$this->appView->redirect(\view\MessageView::$welcomeBack);
 
-			//self::$isLoggedIn = true;
 		}
 		// Cookies exists but don't pass the hasBeenRemembered method and therefore are manipulated.
 		elseif ($loginView->getUserNameCookie() !== null && $loginView->getPasswordCookie() !== null) {
@@ -131,14 +121,13 @@ class LoginController {
 
 	/**
 	 * Preforms logout. Removes cookies, sessions and user in persistent storage. Returns false.
-	 * @param  string $message, Message that is to be displayed after sign out.
+	 * @param  string $message Message that is to be displayed after sign out.
 	 * @return boolean
 	 */
 	private function logout($message) {
 		$this->loginModel->forgetUser();
 		$this->loginModel->removeUserSession();
 		$this->loginView->destroyCookies();
-		//$this->loginView->reloadPage($message);
 		$this->appView->redirect($message);
 	}
 

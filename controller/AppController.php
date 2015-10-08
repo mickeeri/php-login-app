@@ -2,22 +2,18 @@
 
 namespace controller;
 
-// Models
 require_once("model/UserDAL.php");
 require_once("model/UserModel.php");
 require_once("model/UserFacade.php");
 
-// Views
 require_once("view/RegisterView.php");
 require_once("view/LoginView.php");
 
-// Controllers
 require_once("controller/UserController.php");
 require_once('controller/LoginController.php');
 
-/**
-* 
-*/
+require_once("DbSettings.php");
+
 class AppController {
 
 	private $loginModel; 
@@ -30,8 +26,7 @@ class AppController {
 	 * @param \view\AppView     $appView  
 	 */
 	function __construct(\view\AppView $appView) {
-		// Lägg detta i någon annan fil. 
-		$this->mysqli = new \mysqli("me222wm.se.mysql", "me222wm_se", "6aVQjh4v", "me222wm_se");
+		$this->mysqli = new \mysqli(\DbSettings::HOST, \DbSettings::USERNAME, \DbSettings::PASSWORD, \DbSettings::DATABASE);
 		if(mysqli_connect_errno()) {
 			printf("Connect failed: %s\n", mysqli_connect_error());
 			exit();

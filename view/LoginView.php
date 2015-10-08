@@ -13,14 +13,8 @@ class LoginView {
 	private static $cookiePassword = 'LoginView::CookiePassword';
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
-	//private static $cookieMessage = 'LoginView::CookieMessage';
-	//private static $message; 
-	// Username-field value.
-	//public $nameFieldValue;
-	//private $message = "";
+	
 	public static $message;
-
-	//public $message = "";
 
 	private $loginModel;
 
@@ -107,10 +101,6 @@ class LoginView {
 		setcookie(self::$cookiePassword, "", time() - 1);
 	}
 
-	// public function getMessage($message) {
-	// 	return $message;
-	// }
-
 	/**
 	* Generate HTML code on the output buffer for the logout button
 	* @param $message, String output message
@@ -175,52 +165,15 @@ class LoginView {
 	public function getRequestPassword() {
 		return isset($_POST[self::$password]) ? $_POST[self::$password] : "";
 	}
-
-	/**
-	 * Sets a feedback-message as cookie to be displayed after reload.
-	 * @param string $message
-	 */
-	// public function setCookieMessage($message) {
-	// 	setcookie(self::$cookieMessage, $message, -1);
-	// }
-
-	/**
-	 * Sets message.
-	 * @param string $message
-	 */
-	// public function setMessage($message) {
-	// 	self::$message = $message;
-	// }
 	
 	/**
 	 * Creates Username and Password cookie if user wants to be remembered.
 	 * @param string $userName        
 	 * @param string $password     
-	 * @param string $cookieExpirationTime, How long the the cookies are going to exist.
+	 * @param string $cookieExpirationTime how long the the cookies are going to exist.
 	 */
 	public function setCookies($userName, $password, $cookieExpirationTime){
 		setcookie(self::$cookieName, $userName, $cookieExpirationTime);
 		setcookie(self::$cookiePassword, $password, $cookieExpirationTime);
 	}
-
-	/**
-	 * Saves message in cookie and then reloads page.
-	 * @param  string $message, To be stored in cookie and displayed after reload.
-	 * @return void
-	 */
-	// public function reloadPage($message) {
-	// 	// Now does this in navigationView;
-	// 	$this->setCookieMessage($message);
-	// 	header('Location: '.$_SERVER['REQUEST_URI']);
-	// 	exit();	
-	// }
-
-	
-	// *
-	//  * Provides information on users browser. 
-	//  * @return string, User agent
-	 
-	// public function getClientIdentifier() {
-	// 	return $_SERVER["HTTP_USER_AGENT"];
-	// }
 }

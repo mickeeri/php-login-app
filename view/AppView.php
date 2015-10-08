@@ -3,15 +3,10 @@
 namespace view;
 
 /**
-* Collects functionality that both login and user views has in common. 
+* Collects functionality that both login and user view has in common. 
 */
 class AppView {
 	
-	/**
-	 * [$loginURLID description]
-	 * @var string
-	 */
-	//private static $loginURLID = "login";
 	private static $newUserURL = "register";
 	private static $sessionSaveLocation = "\\view\\AppView\\message";
 	private static $messageCookieName = "AppView::Message";
@@ -40,6 +35,7 @@ class AppView {
 		return isset($_GET[self::$newUserURL]) == false;
 	}
 
+	// Some messages are saved as session and fetched after redirect. 
 	public function getSessionMessage() {
 		if (isset($_SESSION[self::$sessionSaveLocation])) {
 			$message = $_SESSION[self::$sessionSaveLocation];
@@ -49,16 +45,16 @@ class AppView {
 		return "";
 	}
 
-	// public function getCookieMessage() {
-	// 	$ret = isset($_COOKIE[self::$messageCookieName]) ? $_COOKIE[self::$messageCookieName] : "";
-	// 	setcookie(self::$messageCookieName, "", time() - 1);
-	// 	return $ret;
-	// }
-
+	// Get saved username. 
 	public function getSavedUserName() {
 		$ret = isset($_COOKIE[self::$newUserCookieName]) ? $_COOKIE[self::$newUserCookieName] : "";
 		setcookie(self::$newUserCookieName, "", time() - 1);
 		return $ret;
+	}
+
+	// Save username to be displayed later in LoginView username text field. 
+	public function saveNewUsersName($userName) {
+		setcookie(self::$newUserCookieName, $userName, -1);
 	}
 
 	/**
@@ -79,9 +75,5 @@ class AppView {
 	 */
 	public function getClientIdentifier() {
 		return $_SERVER["HTTP_USER_AGENT"];
-	}
-
-	public function saveNewUsersName($userName) {
-		setcookie(self::$newUserCookieName, $userName, -1);
 	}
 }
