@@ -1,27 +1,27 @@
 <?php
 
-//INCLUDE THE FILES NEEDED...
 require_once('model/LoginModel.php');
 require_once('view/Messages.php');
 require_once("view/AppView.php");
 require_once('view/LayoutView.php');
 require_once('view/DateTimeView.php');
 require_once('controller/AppController.php');
-require_once("DbSettings.php");
 
-// // MAKE SURE ERRORS ARE SHOWN... MIGHT WANT TO TURN THIS OFF ON A PUBLIC SERVER
-if (false) {
+$showErrors = false;
+
+if ($showErrors) {
 	error_reporting(-1);
 	ini_set('display_errors', 'ON');
 }
 
-// Start session before creating model
 session_start();
 
 $av = new \view\AppView();
 $ac = new \controller\AppController($av);
 
 $ac->handleInput();
+
+// Choose view to generate.
 $view = $ac->generateOutput();
 
 $dtv = new \view\DateTimeView();

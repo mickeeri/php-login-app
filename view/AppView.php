@@ -3,7 +3,7 @@
 namespace view;
 
 /**
-* Collects functionality that both login and user view has in common. 
+* Collects functionality that all views have in common.
 */
 class AppView {
 	
@@ -18,7 +18,7 @@ class AppView {
 	 * Provides link to register new user page.
 	 */
 	public function getLinkToRegisterNewUser() {
-		return "<a href='?register'>Register a new user<a/>";
+		return "<a href='?register'>Register a new user</a>";
 	}
 
 	/**

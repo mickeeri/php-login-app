@@ -2,16 +2,15 @@
 
 namespace view;
 
-
-
 class LayoutView {  
-  /**
-   * Renders HTML
-   * @param  boolean $isLoggedIn method from UserModel
-   * @param  \view\ $v either LoginView or UserView
-   * @param  DateTimeView $dtv       
-   */
-  public function render($isLoggedIn, $v, DateTimeView $dtv, AppView $nv) {
+    /**
+     * Renders page HTML
+     * @param  boolean $isLoggedIn based on method in AppController
+     * @param  \view\LoginView | \view\RegisterView $v 
+     * @param  DateTimeView $dtv   
+     * @param  AppView      $av 
+     */
+    public function render($isLoggedIn, $v, DateTimeView $dtv, AppView $av) {
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -20,7 +19,7 @@ class LayoutView {
         </head>
         <body>
           <h1>Assignment 4</h1>
-          ' . $this->renderNavigation($nv, $isLoggedIn) . ' 
+          ' . $this->renderNavigation($av, $isLoggedIn) . ' 
           ' . $this->renderIsLoggedIn($isLoggedIn) . '
           
           <div class="container">
@@ -35,7 +34,6 @@ class LayoutView {
   
   /**
    * Renders h2 based on logged in or not.
-   * @param  boolean $isLoggedIn
    */
   private function renderIsLoggedIn($isLoggedIn) {
     if ($isLoggedIn) {

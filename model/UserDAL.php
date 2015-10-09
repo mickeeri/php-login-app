@@ -4,26 +4,27 @@ namespace model;
 
 class UserDontExistException extends \Exception {};
 
-/**
-*
-*/
 class UserDAL
 {
 	
 	private static $table = "Users";
 	
 	/**
-	 * [__construct description]
-	 * @param \mysqli $db [description]
+	 * @param \mysqli $db initialized in AppController
 	 */
 	function __construct(\mysqli $db) {
 		$this->database = $db;
 	}
 
+	/**
+	 * Retuns all users in database
+	 * @return array 
+	 */
 	public function getUsers(){
 		$users = array();
 
 		$stmt = $this->database->prepare("SELECT * FROM " . self::$table);
+		
 		if ($stmt === false) {
 			throw new \Exception($this->database->error);
 		}
@@ -43,11 +44,10 @@ class UserDAL
 
 	/**
 	 * Add new user to database
-	 * @param User $userToBeAdded user object
 	 */
 	public function add(User $userToBeAdded){
-		
-		$stmt = $this->database->prepare("INSERT INTO `me222wm_se`.`Users`(
+				
+		$stmt = $this->database->prepare("INSERT INTO `" . \DbSettings::DATABASE .  "`.`" . self::$table . "`(
 			`userName`, `password`) 
 				VALUES (?, ?)");
 
@@ -63,11 +63,10 @@ class UserDAL
 	}
 
 	/**
-	 * Get user by typing in userName
-	 * @return [type] [description]
+	 * @return User $user
 	 */
 	public function getUserByUserName($userName) {
-		$stmt = $this->database->prepare("SELECT * FROM Users WHERE userName=?");
+		$stmt = $this->database->prepare("SELECT * FROM `" . self::$table . "` WHERE userName=?");
 
 		if ($stmt === false) {
 			throw new \Exception($this->database->error);

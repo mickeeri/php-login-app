@@ -11,8 +11,10 @@ class RegisterView
 	private static $passwordConfirmationPostID = "RegisterView::PasswordRepeat";
 
 	private $message = "";
-
 	private static $registrationHasSucceeded = false;
+
+	private $userFacade;
+	private $appView;
 	
 	public function __construct(\model\UserFacade $m, \view\AppView $appView)
 	{
@@ -21,7 +23,6 @@ class RegisterView
 	}
 
 	/**
-	 * User has pressed submit-button.
 	 * @return boolean true if user has pressed submit
 	 */
 	public function userWantToRegister() {
@@ -35,7 +36,7 @@ class RegisterView
 		if(self::$registrationHasSucceeded) {
 			// Saves user name to be displayed in login text field.
 			$this->appView->saveNewUsersName($_POST[self::$userNamePostID]);
-			$this->appView->redirect("Registered new user.");
+			$this->appView->redirect(\view\MessageView::$successfulRegistration);
 		} else {
 			return $this->getHTML();
 		}		
@@ -53,17 +54,17 @@ class RegisterView
 		try {
 			return new \model\User($userName, $password, $passwordConfirmation);			
 		} catch (\model\NoCredentialsException $e) {
-			$this->message = "Username has too few characters, at least 3 characters.<br>Password has too few characters, at least 6 characters.";
+			$this->message = \view\MessageView::$userNameTooFewChars . \view\MessageView::$break . \view\MessageView::$passwordTooFewChars;
 		} catch (\model\NoUserNameException $e) {
-			$this->message = "Username has too few characters, at least 3 characters.";
+			$this->message = \view\MessageView::$userNameTooFewChars;
 		} catch (\model\NoPasswordException $e) {
-			$this->message = "Password has too few characters, at least 6 characters.";
+			$this->message = \view\MessageView::$passwordTooFewChars;
 		} catch (\model\UserNameInvalidCharException $e) {
-			$this->message = "Username contains invalid characters.";
+			$this->message = \view\MessageView::$userNameInvalidChars;
 		} catch (\model\PasswordConfirmationMatchException $e) {
-			$this->message = "Passwords do not match.";
+			$this->message = \view\MessageView::$passwordMatch;
 		} catch (Exception $e) {
-			$this->message = "Something went wrong. Try again!";
+			$this->message = \view\MessageView::$generalErrorMessage;
 		}
 		return null;
 	}
@@ -123,7 +124,7 @@ class RegisterView
 	 * If user already exists in database.
 	 */
 	public function setUserExists() {
-		$this->message = "User exists, pick another username.";
+		$this->message = \view\MessageView::$userExists;
 	}
 
 }

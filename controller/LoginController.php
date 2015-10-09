@@ -3,16 +3,12 @@
 namespace controller;
 
 class LoginController {
+
 	private $loginModel;
 	private $loginView;
 	private $appView;
 
-	/**
-	 * Created in AppController.
-	 * @param \model\LoginModel $loginModel 
-	 * @param \view\LoginView   $loginView  
-	 * @param \view\AppView     $appView   
-	 */
+
 	public function __construct(\model\LoginModel $loginModel, \view\LoginView $loginView, \view\AppView $appView) {				
 		$this->loginModel = $loginModel;
 		$this->loginView = $loginView;
@@ -20,8 +16,7 @@ class LoginController {
 	}
 	
 	/**
-	 * Performs diffrent types of sign in/sign out based on user input. Returns true if user is logged in.
-	 * @return boolean
+	 * Performs different types of sign in/sign out based on user input.
 	 */
 	public function doLogin(){
 		$loginView = $this->loginView;
@@ -46,7 +41,7 @@ class LoginController {
 			$this->appView->redirect(\view\MessageView::$welcomeBack);
 
 		}
-		// Cookies exists but don't pass the hasBeenRemembered method and therefore are manipulated.
+		// Cookies exists but don't pass the hasBeenRemembered method and therefore is manipulated.
 		elseif ($loginView->getUserNameCookie() !== null && $loginView->getPasswordCookie() !== null) {
 			
 			$this->logout(\view\MessageView::$manipulatedCookie);			
@@ -81,10 +76,7 @@ class LoginController {
 	}
 
 	/**
-	 * Checks if entered username and password is valid and credentials are correct
-	 * @param  string $userName 
-	 * @param  string $password
-	 * @return boolean      
+	 * Checks if entered username and password is valid and credentials are correct   
 	 */
 	public function checkCredentials($userName, $password) {
 		try {
@@ -94,8 +86,11 @@ class LoginController {
 			} else {
 				return false;
 			}				
+		} catch (\model\MissingUserNameException $e) {
+			$this->loginView->setMessage(\view\MessageView::$userNameMissing);
+		} catch (\model\MissingPasswordException $e) {
+			$this->loginView->setMessage(\view\MessageView::$passwordMissing);
 		} catch (\model\UserDontExistException $e) {
-			//$this->appView->redirect(\view\MessageView::$userDontExist);
 			$this->appView->redirect(\view\MessageView::$wrongCredentials);
 		} catch (\model\WrongCredentialsException $e) {
 			$this->appView->redirect(\view\MessageView::$wrongCredentials);
@@ -104,11 +99,9 @@ class LoginController {
 
 	/**
 	 * Performs login attempt. Returns true if successful.
-	 * @param  string $userName
-	 * @param  string $password 
-	 * @param  string $client Users browser.
-	 * @param  string $message Message that is to be displayed after sign in.
-	 * @return boolean redirect | false
+	 * @param  string $client Users browser
+	 * @param  string $message Message that is to be displayed after sign in
+	 * @return redirects or boolean false
 	 */
 	private function login($userName, $password, $client, $message) {
 
@@ -120,9 +113,8 @@ class LoginController {
 	}
 
 	/**
-	 * Preforms logout. Removes cookies, sessions and user in persistent storage. Returns false.
+	 * Preforms logout. Removes cookies, sessions and user in persistent storage, then redirects.
 	 * @param  string $message Message that is to be displayed after sign out.
-	 * @return boolean
 	 */
 	private function logout($message) {
 		$this->loginModel->forgetUser();
@@ -133,7 +125,7 @@ class LoginController {
 
 	/**
 	 * Call from AppController
-	 * @return LoginView loginView
+	 * @return LoginView returns this view
 	 */
 	public function getView() {
 		return $this->loginView;

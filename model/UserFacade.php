@@ -3,13 +3,11 @@
 namespace model;
 
 /**
-* 
-*/
-class UserFacade
-{
+ * Handles communication with DAL-class.
+ */
+class UserFacade {
 	
-	function __construct(UserDAL $db)
-	{
+	function __construct(UserDAL $db) {
 		$this->dal = $db;
 	}
 
@@ -21,8 +19,9 @@ class UserFacade
 
 		$users = $this->getUsers();
 		foreach ($users as $user) {
+			// Makes sure username does not already exist
 			if ($user->getUserName() === $userToBeAdded->getUserName()) {
-				throw new \Exception("You cannot have two users with same username.");
+				throw new \Exception();
 			}
 		}
 
@@ -31,12 +30,16 @@ class UserFacade
 
 	/**
 	 * Returns all users in database.
-	 * @return [type] [description]
+	 * @return array
 	 */
 	public function getUsers(){
 		return $this->dal->getUsers();
 	}
 
+	/**
+	 * Get one user from database
+	 * @return \model\User
+	 */
 	public function getUser($userName) {
 		return $this->dal->getUserByUserName($userName);
 	}

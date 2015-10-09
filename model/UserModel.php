@@ -17,6 +17,7 @@ class User {
 	
 	function __construct($userName, $password, $passwordConfirmation) {
 		
+		// Validation
 		if(mb_strlen($userName) < 3 && mb_strlen($password) < 6) {
 			throw new NoCredentialsException();
 		}

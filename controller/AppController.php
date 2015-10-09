@@ -23,9 +23,9 @@ class AppController {
 
 	/**
 	 * Created in index.php
-	 * @param \view\AppView     $appView  
 	 */
 	function __construct(\view\AppView $appView) {
+		// Setting up database.
 		$this->mysqli = new \mysqli(\DbSettings::HOST, \DbSettings::USERNAME, \DbSettings::PASSWORD, \DbSettings::DATABASE);
 		if(mysqli_connect_errno()) {
 			printf("Connect failed: %s\n", mysqli_connect_error());
@@ -39,14 +39,13 @@ class AppController {
 	}
 
 	/**
-	 * Based on input method selects either LoginView or RegisterView.
+	 * Based on input selects either LoginView or RegisterView.
 	 */
 	public function handleInput() {
 		if ($this->appView->onLoginPage()) {
 			$view = new \view\LoginView($this->loginModel, $this->appView);
 			$login = new \controller\LoginController($this->loginModel, $view, $this->appView);
 
-			// Handle input 
 			$login->doLogin();
 			$this->view = $login->getView();
 		} else {

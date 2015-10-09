@@ -3,6 +3,8 @@
 namespace model;
 
 class WrongCredentialsException extends \Exception {};
+class MissingUserNameException extends \Exception {};
+class MissingPasswordException extends \Exception {};
 
 class LoginModel {
 
@@ -11,13 +13,7 @@ class LoginModel {
 	private static $folder = "data/";
 	private $userFacade;
 
-	/**
-	 * [__construct description]
-	 */
 	public function __construct(\model\userFacade $userFacade) {
-		//$this->loginView = $loginView;
-		$this->correctUserName = "admin";
-		$this->correctPassword = "pass";
 		$this->userFacade = $userFacade;
 	}
 
@@ -36,43 +32,29 @@ class LoginModel {
 
 	/**
 	 * Authorizes users credentials
-	 * @param  string $enteredUserName 
-	 * @param  string $enteredPassword
-	 * @return booelean true if correct password
+	 * @param  string $enteredUserName
+	 * @param  string $enteredPassword hashed password
+	 * @return boolean true if credentials are correct, throws exception if not
 	 */
 	public function authorize($enteredUserName, $enteredPassword) {
 	
-		if($this->validateInput($enteredUserName, $enteredPassword)) {
-			$user = $this->userFacade->getUser($enteredUserName);
-			$hash = $user->getPassword();
 
-			if (password_verify($enteredPassword, $hash)) {
-				return true;
-			} else {
-				throw new WrongCredentialsException();
-			}
+		// Checks for empty strings
+		if($enteredUserName == "") {
+			//throw new \Exception(\view\MessageView::$userNameMissing);
+			throw new MissingUserNameException();			
 		}
-	}
+		if ($enteredPassword == "") {
+			throw new MissingPasswordException();				
+		} 
 
-	/**
-	 * Validates that input is not empty strings
-	 * @param  string $enteredUserName 
-	 * @param  string $enteredPassword 
-	 * @return boolean             
-	 */
-	private function validateInput($enteredUserName, $enteredPassword) {
-		try {
-			if($enteredUserName == "") {
-				throw new \Exception(\view\MessageView::$userNameMissing);			
-			} elseif ($enteredPassword == "") {
-				throw new \Exception(\view\MessageView::$passWordMissing);				
-			} 
+		$user = $this->userFacade->getUser($enteredUserName);
+		$hash = $user->getPassword();
 
+		if (password_verify($enteredPassword, $hash)) {
 			return true;
-			
-		} catch (\Exception $e) {
-			\view\LoginView::$message = $e->getMessage(); 
-			return false;
+		} else {
+			throw new WrongCredentialsException();
 		}
 	}
 
@@ -91,9 +73,7 @@ class LoginModel {
 
 	/**
 	 * Checks if user has been remembered in persistent storage.
-	 * @param  string  $user, Username
-	 * @param  string  $password
-	 * @return boolean, True if user is remembered
+	 * @return boolean true if user is remembered
 	 */
 	public function hasBeenRemembered($user, $password) {
 		
@@ -116,9 +96,8 @@ class LoginModel {
 	/**
 	 * Stores information about user as file.
 	 * @param  string $user
-	 * @param  string $password, Random password string.
-	 * @param  string $rememberExpiration, How long the user is to be rememered.
-	 * @return void
+	 * @param  string $password random password string.
+	 * @param  string $rememberExpiration how long the user is to be rememered.
 	 */
 	public function rememberUser($user, $password, $rememberExpiration) {
 		// Creates file.
@@ -130,10 +109,7 @@ class LoginModel {
 	}
 
 	/**
-	 * Gets filename
-	 * @param  string $user     
-	 * @param  string $password 
-	 * @return string, File-path
+	 * @return string file-path
 	 */
 	public function getFileName($user, $password) {
 		return self::$folder . $user . '_' . $password;
@@ -141,7 +117,6 @@ class LoginModel {
 
 	/**
 	 * Removes all files in data-folder.
-	 * @return void
 	 */
 	public function forgetUser() {
 		// http://stackoverflow.com/questions/4594180/deleting-all-files-from-a-folder-using-php
@@ -153,17 +128,12 @@ class LoginModel {
 		}
 	}
 
-	/**
-	 * Removes user session
-	 * @return void
-	 */
 	public function removeUserSession() {
 		unset($_SESSION[self::$userSession]);
 	}
 
 	/**
 	 * Creates random string that is used as temporary password
-	 * @return string, Random string.
 	 */
 	public function getRandomStringPassword() {
 		return sha1(rand());
