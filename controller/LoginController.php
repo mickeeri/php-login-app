@@ -113,7 +113,7 @@ class LoginController {
 	}
 
 	/**
-	 * Preforms logout. Removes cookies, sessions and user in persistent storage, then redirects.
+	 * Performs logout. Removes cookies, sessions and user in persistent storage, then redirects.
 	 * @param  string $message Message that is to be displayed after sign out.
 	 */
 	private function logout($message) {
